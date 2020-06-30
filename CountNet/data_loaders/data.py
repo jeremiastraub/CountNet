@@ -4,13 +4,11 @@ import os
 
 import numpy as np
 from scipy.io import loadmat
-from PIL import Image
+import matplotlib.pyplot as plt
 
 import torchvision
 from torch.utils.data.dataset import Dataset
 from torch.utils.data import DataLoader
-
-from .utils import read_jpg
 
 # -----------------------------------------------------------------------------
 
@@ -21,9 +19,10 @@ class MallDataset(Dataset):
         """Initializes the MallDataset
         
         Args:
-            path_to_folder (str): Description
-            train (bool, optional): Description
-            transform (None, optional): Description
+            path_to_folder (str): Path to the folder containing the mall-data
+            train (bool, optional): If true, the training data is loaded. Else,
+                the test data is loaded.
+            transform (None, optional): Transformations to apply to the data
         """
         super().__init__()
 
@@ -46,21 +45,28 @@ class MallDataset(Dataset):
         frames_path = os.path.join(self.path, "frames/seq_"+"{idx:06d}"+".jpg")
         gt_path = os.path.join(self.path, "mall_gt.mat")
 
+        np.random.seed(0)
+        train_idxs, test_idxs = np.split(np.random.permutation(2000), [1800])
+
+        if train:
+            idxs = train_idxs
+        else:
+            idxs = test_idxs
+
         # Load the images
-        # NOTE For now, only import the first 10 images (since loading .jpg
-        #      files from disc takes a long time)
-        frames = np.empty((10, 480, 640, 3))
+        # TODO For now, only import the first 10 images. Replace with `idxs`.
+        frames = []
         for i in range(10):
-            frames[i] = read_jpg(frames_path.format(idx=i+1))
+            frames.append(plt.imread(frames_path.format(idx=i+1)))
 
         # Load the groundtruth
         gt = loadmat(gt_path)
 
         self.data = frames
-        self.count = gt['count']
+        self.count = gt['count'][:10]
         # The positions are stored in a nested structure of arrays and tuples,
         # hence the somewhat ugly item access...
-        self.pos = [gt['frame'][:,i][0][0][0][0] for i in range(2000)]
+        self.pos = [gt['frame'][:,i][0][0][0][0] for i in range(10)]
 
     def __getitem__(self, idx):
         """Returns tuple of image, total count, and positions at given index"""
