@@ -12,28 +12,21 @@ from torch.utils.data.dataset import Dataset
 
 class MallDataset(Dataset):
     """The mall dataset"""
-    def __init__(self, path_to_folder: str, *, train: bool=True,
-                                               transform=None):
+    def __init__(self, path_to_folder: str, *, train: bool=True):
         """Initializes the MallDataset
         
         Args:
             path_to_folder (str): Path to the folder containing the mall-data
             train (bool, optional): If true, the training data is loaded. Else,
                 the test data is loaded.
-            transform (None, optional): Transformations to apply to the data
         """
         super().__init__()
 
         if not os.path.exists(path_to_folder):
             raise FileNotFoundError(f"Path '{path_to_folder}' does not exist!")
 
-        if transform is not None and not callable(transform):
-            raise TypeError("Invalid 'transform' type. Must be 'None' or "
-                            f"'Callable', got: {type(transform)}")
-
         self.path = path_to_folder
         self.train = train
-        self.transform = transform
 
         # TODO Store the data as HDF5 once and adapt this function to read
         #      from the HDF5 file. This is much quicker and allows for a
@@ -68,13 +61,8 @@ class MallDataset(Dataset):
 
     def __getitem__(self, idx):
         """Returns tuple of image, total count, and positions at given index"""
-        frame, count, pos = self.data[idx], self.count[idx], self.pos[idx]
-
-        if self.transform is not None:
-            frame, count, pos = self.transform(frame, count, pos)
-
         # TODO Find a consistent output format here
-        return frame, (count, pos)
+        return self.data[idx], (self.count[idx], self.pos[idx])
 
     def __len__(self):
         return len(self.data)
