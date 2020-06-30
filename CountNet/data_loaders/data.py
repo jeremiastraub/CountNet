@@ -6,9 +6,7 @@ import numpy as np
 from scipy.io import loadmat
 import matplotlib.pyplot as plt
 
-import torchvision
 from torch.utils.data.dataset import Dataset
-from torch.utils.data import DataLoader
 
 # -----------------------------------------------------------------------------
 
