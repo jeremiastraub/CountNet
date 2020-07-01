@@ -19,3 +19,5 @@ DLR-ACD, DroneCrowd, GCC, NWPU-Crowd
 - Deep Spatial Regression Model for Image Crowd Counting: https://arxiv.org/pdf/1710.09757.pdf
 - Iterative Crowd Counting: https://www3.cs.stonybrook.edu/~minhhoai/papers/crowdcountingECCV18.pdf
 - CNN-based Density Estimation and Crowd Counting - A Survey: https://arxiv.org/pdf/2003.12783v1.pdf
+- Microscopy Cell Counting with Fully Convolutional Regression Networks: https://www.robots.ox.ac.uk/~vgg/publications/2015/Xie15/weidi15.pdf
+- People Counting in Dense Crowd Images Using Sparse Head Detections: https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8283650
