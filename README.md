@@ -18,3 +18,4 @@ DLR-ACD, DroneCrowd, GCC, NWPU-Crowd
 - CSRNet - Dilated Convolutional Neural Networks for Understanding the Highly Congested Scenes: https://arxiv.org/pdf/1802.10062.pdf
 - Deep Spatial Regression Model for Image Crowd Counting: https://arxiv.org/pdf/1710.09757.pdf
 - Iterative Crowd Counting: https://www3.cs.stonybrook.edu/~minhhoai/papers/crowdcountingECCV18.pdf
+- CNN-based Density Estimation and Crowd Counting - A Survey: https://arxiv.org/pdf/2003.12783v1.pdf
