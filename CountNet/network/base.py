@@ -1,1 +1,0 @@
-"""Implements a base class for the CountNet architecture"""
