@@ -15,15 +15,16 @@ class CrowdCountingDataset(Dataset):
     """Base class for Crowd-counting datasets. Derived classes overwrite the
     ``_extract_data`` method.
     """
-    # TODO Add ``transformation`` arg to allow passing transformations that are
-    #      applied to the images in ``__getitem__()`` (e.g. rescaling)
-    def __init__(self, path_to_folder: str, *, train: bool=True):
+    def __init__(self, path_to_folder: str, *, train: bool=True,
+                                               transform=None):
         """Initializes the dataset.
         
         Args:
             path_to_folder (str): Path to the folder containing the data
             train (bool, optional): If true, the training data is loaded. Else,
                 the test data is loaded.
+            transform (Callable, optional): A function/transform that takes the
+                image and the target and returns the tranformed versions.
         """
         super().__init__()
 
@@ -32,20 +33,22 @@ class CrowdCountingDataset(Dataset):
 
         self.path = path_to_folder
         self.train = train
+        self.transform = transform
 
         # TODO Store the data as HDF5 once and adapt this function to read
         #      from the HDF5 file. This is much quicker and allows for a
         #      uniform datastructure.
-        images, count, pos = self._extract_data()
+        image_data, density = self._extract_data()
 
-        self.data = images
-        self.count = count
-        self.pos = pos
+        self.data = image_data
+        self.density = density
 
     def __getitem__(self, idx):
         """Returns tuple of image, total count, and positions at given index"""
-        # TODO Find a consistent output format here
-        return self.data[idx], (self.count[idx], self.pos[idx])
+        if self.transform is not None:
+            return self.transform(self.data[idx], self.density[idx])
+
+        return self.data[idx], self.density[idx]
 
     def __len__(self):
         return len(self.data)
@@ -56,6 +59,9 @@ class CrowdCountingDataset(Dataset):
 
 # -----------------------------------------------------------------------------
 # Derived classes
+
+# FIXME Generate ground-truth density maps and load the data from the generated
+#       ground-truth.
 
 class MallDataset(CrowdCountingDataset):
     """The mall dataset.
@@ -80,7 +86,10 @@ class MallDataset(CrowdCountingDataset):
         # TODO For now, only import the first 10 images. Replace with `idxs`.
         frames = []
         for i in range(10):
-            frames.append(plt.imread(frames_path.format(idx=i+1)))
+            img = plt.imread(frames_path.format(idx=i+1)).astype(float)
+            img = np.transpose(img, (2,0,1))
+            img /= img.max()
+            frames.append(img)
 
         # Load the groundtruth
         gt = loadmat(gt_path)
@@ -113,7 +122,10 @@ class ShanghaiTechDataset(CrowdCountingDataset):
         images = []
         gt = []
         for i in range(10):
-            images.append(plt.imread(image_path.format(idx=i+1)))
+            img = plt.imread(image_path.format(idx=i+1)).astype(float)
+            img = np.transpose(img, (2,0,1))
+            img /= img.max()
+            images.append(img)
             gt.append(loadmat(gt_path.format(idx=i+1)))
 
         count = [label['image_info'].item().item()[1].astype('uint8')
@@ -146,7 +158,10 @@ class UFC_CC_50Dataset(CrowdCountingDataset):
         images = []
         gt = []
         for i in idxs:
-            images.append(plt.imread(image_path.format(idx=i+1)))
+            img = plt.imread(image_path.format(idx=i+1)).astype(float)
+            img = np.transpose(img, (2,0,1))
+            img /= img.max()
+            images.append(img)
             gt.append(loadmat(gt_path.format(idx=i+1)))
 
         count = [len(label['annPoints']) for label in gt]
