@@ -2,6 +2,7 @@
 Using supervised deep learning to count people in images.
 
 ### Datasets
+- **UCF-QNRF**: contains 1535 images which are divided into train and test sets of 1201 and 334 images respectively. It is very diverse in terms of prepectivity, image resolution, crowd density and the scenarios which a crowd exist. Is most suitable for training very deep Convolutional Neural Networks (CNNs) since it contains order of magnitude more annotated humans in dense crowd scenes than any other available crowd counting datase.
 - **UCSD**: consists of 2000 pedestrian frames of size 238x158 from a video sequence along with ground truth annotations of each pedestrian in every fifth frame. The dataset contains a total of 49885 pedestrian instances and it is split into training and test set
 - **Mall**: has diverse illumination conditions and crowd densities. Moreover, the scene contained in the dataset has severe perspective distortion. The dataset also presents severe occlusions. The video sequence in the dataset consists of 2000 frames of size 320x240 with 6000 instances of labeled pedestrians split into training and evaluation set
 - **UCF_CC_50**: includes a wide range of densities and diverse scenes with varying perspective distortion. It contains a total of 50 images with an average of 1280 individuals per image. Due to the limited number of images is recommended to define a cross-validation protocol for training and testing.
