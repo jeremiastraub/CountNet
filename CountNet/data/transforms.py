@@ -13,8 +13,8 @@ class RandomCrop_Image_GT():
     """Transformation that, if applied to an (image, density-map) pair,
     randomly crops out and returns equivalent patches of the given size.
     
-    Images are assumed to be of type PIL.Image, density-maps are assumed to be
-    of type np.ndarray (2d).
+    Images are assumed to be of type PIL.Image.Image, density-maps are assumed
+    to be of type np.ndarray (2d).
     """
     def __init__(self, crop_size: Union[int, Tuple[int]]):
         """
@@ -64,8 +64,8 @@ class Downscale_Image_GT():
     downscales both by the given downscaling-factor. The density-map is
     then rescaled such that it sums up to 1.
 
-    Images are assumed to be of type PIL.Image, density-maps are assumed to
-    be of type np.ndarray (2d).
+    Images are assumed to be of type PIL.Image.Image, density-maps are assumed
+    to be of type np.ndarray (2d).
     """
     def __init__(self, downscaling_factor: Union[int, Tuple[int]]):
         """
