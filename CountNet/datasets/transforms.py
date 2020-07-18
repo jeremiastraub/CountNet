@@ -7,6 +7,9 @@ from skimage.transform import downscale_local_mean
 
 # -----------------------------------------------------------------------------
 
+class RandomCrop_Image_GT():
+    pass
+
 class Downscale_Image_GT():
     def __init__(self, downscaling_factor: Union[int, Tuple[int]]):
         """Transformation that, if applied to an (image, density-map) pair,
