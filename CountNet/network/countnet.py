@@ -16,7 +16,7 @@ class CountNet(nn.Module):
 
     def forward(self, x):
         """Computes the forward path."""
-        x = self.layers(x.float())
+        x = self.layers(x)
 
         return x
 
