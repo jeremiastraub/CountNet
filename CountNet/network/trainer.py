@@ -4,6 +4,7 @@ import os
 from datetime import datetime
 
 import numpy as np
+from tqdm import tqdm
 
 import torch
 
@@ -35,49 +36,52 @@ class Trainer(object):
         self.loss_metric = loss_metric
         self.loader_train = loader_train
         self.loader_test = loader_test
+        self.out_path = None
 
         # Create output directory
-        # name = datetime.now().strftime("%y%m%d-%H%M%S")
-        # if name_ext is not None:
-        #     name += "-"+name_ext
-        # out_path = os.path.join(write_to, name)
-        # os.makedirs(out_path, exist_ok=True)
+        if write_to is not None:
+            name = datetime.now().strftime("%y%m%d-%H%M%S")
+            if name_ext is not None:
+                name += "-"+name_ext
+            out_path = os.path.join(write_to, name)
+            os.makedirs(out_path, exist_ok=True)
+            self.out_path = out_path
 
 
-    def train_model(self, epochs: int=1):
+    def train_model(self, epochs: int=1, write_every: int=None):
         """Train the model.
         
         Args:
             epochs (int, optional): The number of epochs to train for
+            write_every (int, optional): If not None, store and return losses
+                in equidistant intervals.
         
         Returns:
-            TYPE: Description
+            array: Losses for different training iterations
         """
         losses = []
-
-        for e in range(epochs):
-            print(f"Epoch {e} of {epochs}...")
-            for t, (img_input, target) in enumerate(self.loader_train):
+        
+        e_count = 1
+        for e in tqdm(range(epochs), desc=f"Training {epochs} Epochs"):
+            for t, (img, target) in enumerate(tqdm(loader_train, leave=False,
+                                               desc=f"Epoch {e_count}")):
                 self.model.train()
 
-                prediction = self.model(img_input)
+                prediction = self.model(image)
                 loss = self.loss_metric(prediction, target)
                 losses.append(loss)
 
-                # Reset gradients
+                # Perform one optimization step
                 self.optimizer.zero_grad()
-
-                # Backward propagation
                 loss.backward()
-
-                # Take one optimizer step
                 self.optimizer.step()
 
                 # TODO - Compute some metrics (?)
                 #      - write output (write out model configuration, too)
-                #      - provide some logging messages (use tqm-package)
 
-        return losses
+            e_count += 1
+
+        return np.array(losses)
 
 
 
@@ -96,9 +100,9 @@ class Trainer(object):
             # Accumulate the metric scores here and average across the data
             scores = np.zeros(len(calc_metrics))
 
-            for t, (img_input, target) in enumerate(self.loader_test):
+            for t, (image, target) in enumerate(self.loader_test):
 
-                prediction = self.model(img_input)
+                prediction = self.model(image)
 
                 for i, metric in enumerate(calc_metrics):
                     scores[i] += metric(prediction, target)
