@@ -22,7 +22,7 @@ def load_yml(path: str, *, mode: str='r'):
     with open(path, mode) as yaml_file:
         return yaml.safe_load(yaml_file)
 
-def initialize_dataset(name: Union[str, dict], cfg: dict):
+def initialize_dataset(name: str, cfg: dict):
     """Creates a CrowdCountingDataset."""
     def initialize_transform(transform):
         """Creates a transform object."""
