@@ -85,10 +85,10 @@ class Trainer(object):
 
 
 
-    def validate_model(self, calc_metrics: list):
+    def validate_model(self, metrics: list):
         """
         Args:
-            calc_metrics (list): List of metrics to compute
+            metrics (list): List of metrics to compute
         
         Returns:
             array: metric scores evaluated on the test data
@@ -98,13 +98,13 @@ class Trainer(object):
         # Dont't need the gradient information
         with torch.no_grad():
             # Accumulate the metric scores here and average across the data
-            scores = np.zeros(len(calc_metrics))
+            scores = np.zeros(len(metrics))
 
             for t, (image, target) in enumerate(self.loader_test):
 
                 prediction = self.model(image)
 
-                for i, metric in enumerate(calc_metrics):
+                for i, metric in enumerate(metrics):
                     scores[i] += metric(prediction, target)
             
             scores /= t
