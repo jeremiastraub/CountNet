@@ -5,14 +5,15 @@ from typing import Union
 from torch.utils.data import DataLoader
 
 from ..data import CrowdCountingDataset, transforms
-from ..network import CountNet, Trainer
+from ..network import CountNet
+from trainer import Trainer
 from utils import load_yml, initialize_trainer
 
 # -----------------------------------------------------------------------------
 
 # Get the configurations
 datasets_cfg = load_yml("data/datasets_cfg.yml")
-run_cfg = load_yml("network/run_cfg.yml")
+run_cfg = load_yml("run_cfg.yml")
 
 model_cfg = run_cfg['CountNet']
 trainer_cfg = run_cfg['Trainer']

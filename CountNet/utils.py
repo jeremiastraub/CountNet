@@ -5,7 +5,8 @@ import torch
 from torch.utils.data import DataLoader
 
 from ..data import CrowdCountingDataset, transforms
-from ..network import CountNet, Trainer
+from ..network import CountNet
+from trainer import Trainer
 
 # -----------------------------------------------------------------------------
 
