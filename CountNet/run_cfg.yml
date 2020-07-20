@@ -7,7 +7,9 @@ CountNet:
 
 Trainer:
   optimizer:
-  loss_metric:
+    SGD:
+      lr: 0.005
+  loss_metric: MSELoss
   loader_train:
     dataset: Mall
     batch_size: 8
