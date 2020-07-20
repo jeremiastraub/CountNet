@@ -67,10 +67,14 @@ class Downscale_Image_GT():
     Images are assumed to be of type PIL.Image.Image, density-maps are assumed
     to be of type np.ndarray (2d).
     """
-    def __init__(self, downscaling_factor: Union[int, Tuple[int]]):
+    def __init__(self, downscaling_factor: Union[int, Tuple[int]],
+                       min_size: Union[int, Tuple[int]]=None):
         """
         Args:
             downscaling_factor (Union[int, Tuple[int]]): The downscaling-factor
+            min_size (Union[int, Tuple[int]], optional): Minimum size of the
+                output image. If the latter would be smaller than `min_size` in
+                any dimension, the downscaling is not applied.
         """
         if isinstance(downscaling_factor, int):
             downscaling_factor = (downscaling_factor, downscaling_factor, 1)
@@ -79,13 +83,23 @@ class Downscale_Image_GT():
             downscaling_factor = (downscaling_factor[0],
                                   downscaling_factor[1], 1)
 
+        if isinstance(min_size, int):
+            min_size = (min_size, min_size)
+
         self.downscaling_factor = downscaling_factor
+        self.min_size = min_size
 
     def __call__(self, image, density_map):
         """Applies the transformation to an image and its density map."""
         assert isinstance(image, Image.Image)
         assert isinstance(density_map, np.ndarray)
         assert density_map.ndim == 2
+
+        if self.min_size is not None:
+            if (   image.size[0]/2 < self.min_size[0]
+                or image.size[1]/2 < self.min_size[1]
+                ):
+                return image, density_map
 
         image = np.array(image)
         img_red = downscale_local_mean(image, factors=self.downscaling_factor)

@@ -1,0 +1,33 @@
+# Default configurations for the CrowdCounting Datasets
+---
+_transforms: &transforms
+  Compose:
+    Downscale_Image_GT:
+      downscaling_factor: 2
+      min_size: [300, 200]
+    RandomCrop_Image_GT:
+      crop_size: [300, 200]
+
+Mall:
+  data_path:
+  mode: train
+  main_transform:
+    <<: *transforms
+
+ShanghaiTech_A:
+  data_path:
+  mode: train
+  main_transform:
+    <<: *transforms
+
+ShanghaiTech_B:
+  data_path:
+  mode: train
+  main_transform:
+    <<: *transforms
+
+UFC_CC_50:
+  data_path:
+  mode: train
+  main_transform:
+    <<: *transforms
