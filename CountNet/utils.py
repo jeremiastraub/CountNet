@@ -4,7 +4,8 @@ import yaml
 import torch
 from torch.utils.data import DataLoader
 
-from ..data import CrowdCountingDataset, transforms
+from ..data import (MallDataset, ShanghaiTechDataset, UCF_CC_50Dataset,
+                    transforms)
 from ..network import CountNet
 from trainer import Trainer
 
@@ -47,12 +48,24 @@ def initialize_dataset(name: str, cfg: dict):
 
     dset_kwargs = cfg[name]
 
+    if name.startswith("Mall"):
+        DatasetType = MallDataset
+
+    elif name.startswith("ShanghaiTech"):
+        DatasetType = ShanghaiTechDataset
+
+    elif name.startswith("UCF_CC_50"):
+        DatasetType = UCF_CC_50Dataset
+
+    else:
+        raise ValueError(f"Invalid Dataset Type: {name}")
+
     # Parse transforms
     for k in list(dset_kwargs.keys()):
         if 'transform' in k:
             dset_kwargs[k] = initialize_transform(dset_kwargs[k])
 
-    return CrowdCountingDataset(**dset_kwargs)
+    return DatasetType(**dset_kwargs)
 
 def initialize_data_loader(cfg: dict, dset_cfg: dict):
     """Creates a DataLoader."""
