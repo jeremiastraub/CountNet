@@ -1,4 +1,4 @@
-"""Transformations that can be passed to the datasets"""
+"""Transformations that can be passed to the CrowdCountingDatasets"""
 
 from typing import Union, Tuple
 
