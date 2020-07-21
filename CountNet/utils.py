@@ -60,7 +60,7 @@ def initialize_data_loader(cfg: dict, dset_cfg: dict):
     data_loader = DataLoader(dataset, **cfg)
     return data_loader
 
-def initialize_trainer(cfg: dict, dset_cfg: dict):
+def initialize_trainer(cfg: dict, model_cfg: dict, dset_cfg: dict):
     """Creates a Trainer."""
     loader_train_cfg = cfg.pop('loader_train')
     loader_test_cfg = cfg.pop('loader_test')

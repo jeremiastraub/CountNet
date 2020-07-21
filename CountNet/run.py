@@ -22,7 +22,8 @@ run_validation_cfg = run_cfg.get('validation', None)
 
 
 if __name__ == '__main__':
-    trainer = initialize_trainer(trainer_cfg, dset_cfg=datasets_cfg)
+    trainer = initialize_trainer(trainer_cfg, model_cfg=model_cfg,
+                                              dset_cfg=datasets_cfg)
     
     # TODO Allow loading a previously saved checkpoint
     
