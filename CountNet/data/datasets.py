@@ -37,17 +37,9 @@ class CrowdCountingDataset(Dataset):
             raise ValueError(f"Invalid mode '{mode}'. Must be either 'train'"
                              "or 'test'.")
 
-        if main_transform is not None and not callable(main_transform):
-            raise TypeError("main_transform must be callable! "
-                            f"Received type: {type(main_transform)}")
-
-        if img_transform is not None and not callable(img_transform):
-            raise TypeError("img_transform must be callable! "
-                            f"Received type: {type(img_transform)}")
-
-        if gt_transform is not None and not callable(gt_transform):
-            raise TypeError("gt_transform must be callable! "
-                            f"Received type: {type(gt_transform)}")
+        assert main_transform is None or callable(main_transform)
+        assert gt_transform is None or callable(gt_transform)
+        assert img_transform is None or callable(img_transform)
 
         # Load the data
         self.mode = mode
