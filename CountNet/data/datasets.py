@@ -109,7 +109,7 @@ class MallDataset(CrowdCountingDataset):
             
             # Store both
             images.append(img)
-            gt.append(dm)
+            gt.append(dm.T)
 
         return images, gt
 
@@ -158,7 +158,7 @@ class ShanghaiTechDataset(CrowdCountingDataset):
             
             # Store both
             images.append(img)
-            gt.append(dm)
+            gt.append(dm.T)
 
         return images, gt
 
@@ -196,6 +196,6 @@ class UCF_CC_50Dataset(CrowdCountingDataset):
             
             # Store both
             images.append(img)
-            gt.append(dm)
+            gt.append(dm.T)
 
         return images, gt
