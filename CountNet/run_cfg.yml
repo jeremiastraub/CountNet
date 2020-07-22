@@ -8,16 +8,16 @@ CountNet:
 
 Trainer:
   optimizer:
-    SGD:
-      lr: 0.005
+    Adam:
+      lr: 0.001
   loss_metric: MSELoss
   loader_train:
-    dataset: UCF_CC_50
-    batch_size: 4
+    dataset: Mall
+    batch_size: 16
     shuffle: True
   loader_test:
-    dataset: UCF_CC_50
-    batch_size: 4
+    dataset: Mall
+    batch_size: 16
     shuffle: True
 
 training:
