@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 """Validation metrics"""
 
 import torch
@@ -120,6 +120,5 @@ def SSIM(x, y, C1=0.01 ** 2, C2=0.03 ** 2):
     ssim_map = (2 * s1 * s2 + C1) * (2 * covar + C2) / ((s1 * s1 + s2 * s2 + C1) * (vari + C2))
     return numpy.mean(ssim_map)
 
-=======
-"""Metrics for model validation"""
->>>>>>> master
+
+
