@@ -20,7 +20,7 @@ class RandomCrop_Image_GT():
         """
         Args:
             crop_size (Union[int, Tuple[int]]): The size of the cropped patch
-                (height, width). If an integer is given, a square patch is
+                (width, height). If an integer is given, a square patch is
                 cropped.
         """
         if isinstance(crop_size, int):
@@ -72,9 +72,11 @@ class Downscale_Image_GT():
         """
         Args:
             downscaling_factor (Union[int, Tuple[int]]): The downscaling-factor
+                (in x-dir, in y-dir).
             min_size (Union[int, Tuple[int]], optional): Minimum size of the
-                output image. If the latter would be smaller than `min_size` in
-                any dimension, the downscaling is not applied.
+                output image (width, height). If the transformed image would be
+                smaller than `min_size` in any dimension, the downscaling is
+                not applied.
         """
         if isinstance(downscaling_factor, int):
             downscaling_factor = (downscaling_factor, downscaling_factor, 1)
@@ -103,10 +105,10 @@ class Downscale_Image_GT():
 
         image = np.array(image)
         img_red = downscale_local_mean(image, factors=self.downscaling_factor)
-        img_red = Image.fromarray((img_red * 255).astype('uint8'), mode='RGB')
+        img_red = Image.fromarray(img_red.astype('uint8'), mode='RGB')
 
         density_map_red = downscale_local_mean(density_map,
-                                        factors=self.downscaling_factor[:2])
+                                    factors=self.downscaling_factor[1::-1])
 
         # Rescale the density-map such that it sums to 1
         density_map_red /= density_map_red.sum()
