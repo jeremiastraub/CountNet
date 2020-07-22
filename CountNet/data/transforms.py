@@ -1,10 +1,11 @@
-"""Transformations that can be passed to the datasets"""
+"""Transformations that can be passed to the CrowdCountingDatasets"""
 
 from typing import Union, Tuple
 
 from PIL import Image
 import numpy as np
 from skimage.transform import downscale_local_mean
+import torch
 from torchvision.transforms import ToTensor
 
 # -----------------------------------------------------------------------------
@@ -20,7 +21,7 @@ class RandomCrop_Image_GT():
         """
         Args:
             crop_size (Union[int, Tuple[int]]): The size of the cropped patch
-                (height, width). If an integer is given, a square patch is
+                (width, height). If an integer is given, a square patch is
                 cropped.
         """
         if isinstance(crop_size, int):
@@ -67,10 +68,16 @@ class Downscale_Image_GT():
     Images are assumed to be of type PIL.Image.Image, density-maps are assumed
     to be of type np.ndarray (2d).
     """
-    def __init__(self, downscaling_factor: Union[int, Tuple[int]]):
+    def __init__(self, downscaling_factor: Union[int, Tuple[int]],
+                       min_size: Union[int, Tuple[int]]=None):
         """
         Args:
             downscaling_factor (Union[int, Tuple[int]]): The downscaling-factor
+                (in x-dir, in y-dir).
+            min_size (Union[int, Tuple[int]], optional): Minimum size of the
+                output image (width, height). If the transformed image would be
+                smaller than `min_size` in any dimension, the downscaling is
+                not applied.
         """
         if isinstance(downscaling_factor, int):
             downscaling_factor = (downscaling_factor, downscaling_factor, 1)
@@ -79,7 +86,11 @@ class Downscale_Image_GT():
             downscaling_factor = (downscaling_factor[0],
                                   downscaling_factor[1], 1)
 
+        if isinstance(min_size, int):
+            min_size = (min_size, min_size)
+
         self.downscaling_factor = downscaling_factor
+        self.min_size = min_size
 
     def __call__(self, image, density_map):
         """Applies the transformation to an image and its density map."""
@@ -87,15 +98,22 @@ class Downscale_Image_GT():
         assert isinstance(density_map, np.ndarray)
         assert density_map.ndim == 2
 
+        if self.min_size is not None:
+            if (   image.size[0]/2 < self.min_size[0]
+                or image.size[1]/2 < self.min_size[1]
+                ):
+                return image, density_map
+
         image = np.array(image)
         img_red = downscale_local_mean(image, factors=self.downscaling_factor)
-        img_red = Image.fromarray((img_red * 255).astype('uint8'), mode='RGB')
+        img_red = Image.fromarray(img_red.astype('uint8'), mode='RGB')
 
+        dm_norm = np.sum(density_map)
         density_map_red = downscale_local_mean(density_map,
-                                        factors=self.downscaling_factor[:2])
+                                    factors=self.downscaling_factor[1::-1])
 
-        # Rescale the density-map such that it sums to 1
-        density_map_red /= density_map_red.sum()
+        # Rescale the density-map such that it sums to N
+        density_map_red *= (dm_norm / np.sum(density_map_red))
 
         return img_red, density_map_red
 
@@ -107,10 +125,11 @@ class ToTensor_Image_GT():
         assert isinstance(density_map, np.ndarray)
         assert density_map.ndim == 2
 
-        image = ToTensor(image)
+        image = ToTensor()(image)
         density_map = torch.from_numpy(density_map[None,...])
+        density_map = density_map.permute(0,2,1)
 
-        return image, density_map
+        return image, density_map.float()
 
 
 class Compose():
