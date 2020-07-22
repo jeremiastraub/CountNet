@@ -108,11 +108,12 @@ class Downscale_Image_GT():
         img_red = downscale_local_mean(image, factors=self.downscaling_factor)
         img_red = Image.fromarray(img_red.astype('uint8'), mode='RGB')
 
+        dm_norm = np.sum(density_map)
         density_map_red = downscale_local_mean(density_map,
                                     factors=self.downscaling_factor[1::-1])
 
-        # Rescale the density-map such that it sums to 1
-        density_map_red /= density_map_red.sum()
+        # Rescale the density-map such that it sums to N
+        density_map_red *= (dm_norm / np.sum(density_map_red))
 
         return img_red, density_map_red
 
