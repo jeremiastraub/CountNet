@@ -22,6 +22,7 @@ Trainer:
 
 training:
   epochs: 1
+  write_every: 1
 
 validation:
   metrics:
