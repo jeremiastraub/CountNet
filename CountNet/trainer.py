@@ -47,7 +47,6 @@ class Trainer(object):
             os.makedirs(out_path, exist_ok=True)
             self.out_path = out_path
 
-
     def train_model(self, epochs: int=1, write_every: int=None):
         """Train the model.
         
@@ -62,9 +61,10 @@ class Trainer(object):
         losses = []
         
         e_count = 1
-        for e in tqdm(range(epochs), desc=f"Training {epochs} Epochs"):
-            for t, (img, target) in enumerate(tqdm(loader_train, leave=False,
-                                               desc=f"Epoch {e_count}")):
+        for e in tqdm(range(epochs), desc=f"Training {epochs} Epoch(s)"):
+            for t, (image, target) in enumerate(tqdm(self.loader_train,
+                                                     leave=False,
+                                                     desc=f"Epoch {e_count}")):
                 self.model.train()
 
                 prediction = self.model(image)
@@ -82,8 +82,6 @@ class Trainer(object):
             e_count += 1
 
         return np.array(losses)
-
-
 
     def validate_model(self, metrics: list):
         """

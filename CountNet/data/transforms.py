@@ -5,6 +5,7 @@ from typing import Union, Tuple
 from PIL import Image
 import numpy as np
 from skimage.transform import downscale_local_mean
+import torch
 from torchvision.transforms import ToTensor
 
 # -----------------------------------------------------------------------------
@@ -123,10 +124,11 @@ class ToTensor_Image_GT():
         assert isinstance(density_map, np.ndarray)
         assert density_map.ndim == 2
 
-        image = ToTensor(image)
+        image = ToTensor()(image)
         density_map = torch.from_numpy(density_map[None,...])
+        density_map = density_map.permute(0,2,1)
 
-        return image, density_map
+        return image, density_map.float()
 
 
 class Compose():

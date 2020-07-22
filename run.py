@@ -4,16 +4,14 @@ from typing import Union
 
 from torch.utils.data import DataLoader
 
-from ..data import CrowdCountingDataset, transforms
-from ..network import CountNet
-from trainer import Trainer
-from utils import load_yml, initialize_trainer
+from CountNet.utils import (load_yml, initialize_trainer,
+                            parse_validation_kwargs)
 
 # -----------------------------------------------------------------------------
 
 # Get the configurations
-datasets_cfg = load_yml("data/datasets_cfg.yml")
-run_cfg = load_yml("run_cfg.yml")
+datasets_cfg = load_yml("CountNet/data/datasets_cfg.yml")
+run_cfg = load_yml("CountNet/run_cfg.yml")
 
 model_cfg = run_cfg['CountNet']
 trainer_cfg = run_cfg['Trainer']
@@ -29,10 +27,10 @@ if __name__ == '__main__':
     
     if run_training_cfg is not None:
         print(f"Starting training...\n\nModel configuration:\n{model_cfg}\n\n"
-              f"Training configuration:\n{run_training_cfg}")
+              f"Training configuration:\n{run_training_cfg}\n")
         trainer.train_model(**run_training_cfg)
 
     if run_validation_cfg is not None:
         print("Starting validation...\n\nValidation configuration:\n"
-              f"{run_validation_cfg}")
-        trainer.validate_model(**run_validation_cfg)
+              f"{run_validation_cfg}\n")
+        trainer.validate_model(**parse_validation_kwargs(run_validation_cfg))

@@ -4,6 +4,7 @@ CountNet:
   depth: 2
   in_channels: 3
   out_channels: 1
+  fmaps: [8, 16]
 
 Trainer:
   optimizer:
@@ -11,12 +12,12 @@ Trainer:
       lr: 0.005
   loss_metric: MSELoss
   loader_train:
-    dataset: Mall
-    batch_size: 8
+    dataset: UCF_CC_50
+    batch_size: 4
     shuffle: True
   loader_test:
-    dataset: Mall
-    batch_size: 8
+    dataset: UCF_CC_50
+    batch_size: 4
     shuffle: True
 
 training:
@@ -24,3 +25,4 @@ training:
 
 validation:
   metrics:
+    - MSELoss
