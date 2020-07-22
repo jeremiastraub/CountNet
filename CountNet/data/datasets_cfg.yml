@@ -7,26 +7,26 @@ _transforms: &transforms
         min_size: [300, 200]
     - RandomCrop_Image_GT:
         crop_size: [300, 200]
-    - ToTensor
+    - ToTensor_Image_GT
 
 Mall:
-  data_path: ..datasets/Mall
+  data_path: datasets/Mall
   main_transform:
     <<: *transforms
 
 ShanghaiTech_A:
   part: A
-  data_path: ..datasets/ShanghaiTech_A
+  data_path: datasets/ShanghaiTech_A
   main_transform:
     <<: *transforms
 
 ShanghaiTech_B:
   part: B
-  data_path: ..datasets/ShanghaiTech_B
+  data_path: datasets/ShanghaiTech_B
   main_transform:
     <<: *transforms
 
 UCF_CC_50:
-  data_path: ..datasets/UCF_CC_50
+  data_path: datasets/UCF_CC_50
   main_transform:
     <<: *transforms
