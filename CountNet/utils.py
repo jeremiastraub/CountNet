@@ -120,9 +120,8 @@ def initialize_trainer(cfg: dict, model_cfg: dict, dset_cfg: dict):
 
     return trainer
 
-def parse_validation_kwargs(kwargs: dict):
-    """Returns the parsed validation kwargs"""
-    metric_names = kwargs['metrics']
+def parse_metrics(metric_names: list):
+    """Returns parsed metric list"""
     metrics_list = []
 
     for m in metric_names:
@@ -137,5 +136,18 @@ def parse_validation_kwargs(kwargs: dict):
             m, m_kwargs = next(iter(m.items()))
             metrics_list.append(getattr(torch.nn, m)(**m_kwargs))
 
-    kwargs['metrics'] = metrics_list
+    return metrics_list
+
+def parse_training_kwargs(kwargs: dict):
+    """Returns the parsed training kwargs"""
+    kwargs = copy.deepcopy(kwargs)
+    if 'validation_metrics' in kwargs:
+        kwargs['validation_metrics'] = parse_metrics(
+                                                kwargs['validation_metrics'])
+    return kwargs
+
+def parse_validation_kwargs(kwargs: dict):
+    """Returns the parsed validation kwargs"""
+    kwargs = copy.deepcopy(kwargs)
+    kwargs['metrics'] = parse_metrics(kwargs['metrics'])
     return kwargs
