@@ -36,8 +36,8 @@ if __name__ == '__main__':
         if losses:
             plt.plot(losses)
             plt.title('Loss')
-            plt.show() # opens separate window, pauses until it is closed
-            # plt.savefig("output.png")
+            # plt.show() # opens separate window, pauses until it is closed
+            plt.savefig("output_loss.png")
 
     if run_validation_cfg is not None:
         print("Starting validation...\n\nValidation configuration:\n"
@@ -48,3 +48,35 @@ if __name__ == '__main__':
         # Print final scores in terminal
         for m, s in zip(run_validation_cfg['metrics'], scores):
             print(f"{m}: {s}")
+
+    # FIXME This is only temporay!
+
+    # Visualize a few predictions
+    img_batch, dm_batch = next(iter(trainer.loader_test))
+
+    for i, _ in zip(range(2), range(img_batch.shape[0])):
+        img = img_batch[i,...]
+        dm = dm_batch[i,...]
+
+        plt.imshow(img.permute(1,2,0).numpy().squeeze())
+        plt.imshow(dm.permute(1,2,0).numpy().squeeze(), alpha=0.5)
+        # plt.show()
+        plt.savefig(f"{i}_output_true.png")
+        plt.close()
+
+        res = trainer.model(img.unsqueeze(0)).detach()
+
+        import torch.nn as nn
+        import numpy as np
+        mse = nn.MSELoss(reduction='sum')
+        print("MSE: ", mse(res.squeeze(), dm.squeeze()))
+
+        res = res.numpy().squeeze()
+        plt.imshow(res, vmin=0)
+        plt.colorbar()
+        # plt.show()
+        plt.savefig(f"{i}_output_res.png")
+        plt.close()
+
+        print(np.sum(dm.permute(1,2,0).numpy().squeeze()))
+        print(np.sum(res))

@@ -8,8 +8,8 @@ CountNet:
 
 Trainer:
   optimizer:
-    SGD:
-      lr: 0.005
+    Adam:
+      lr: 0.001
   loss_metric: MSELoss
   loader_train:
     dataset: UCF_CC_50
