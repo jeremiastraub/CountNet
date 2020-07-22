@@ -1,4 +1,3 @@
-
 """Validation metrics"""
 
 import torch
@@ -124,26 +123,25 @@ def SSIM(x, y, C1=0.01 ** 2, C2=0.03 ** 2):
 # -----------------------------------------------------------------------------
 """Point-level metrics"""
 
-def apk(x, y, k=10):
+
+def APK(x, y, k=10):
     assert isinstance(x, torch.Tensor)
     assert isinstance(y, torch.Tensor)
     assert x.ndim == 4 and y.ndim == 4
 
     # Calculates the average precision at k.
-    if len(y)>k:
-       y = y[:k]
+    if len(y) > k:
+        y = y[:k]
 
     score = 0.0
     num_hits = 0.0
 
-    for i,p in enumerate(y):
+    for i, p in enumerate(y):
         if p in x and p not in y[:i]:
             num_hits += 1.0
-            score += num_hits / (i+1.0)
+            score += num_hits / (i + 1.0)
 
     if not x:
         return 0.0
 
     return score / min(len(x), k)
-
-
