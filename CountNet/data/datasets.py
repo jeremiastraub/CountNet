@@ -86,7 +86,9 @@ class MallDataset(CrowdCountingDataset):
         gt_path = os.path.join(self.data_path, "density_maps.h5")
         
         np.random.seed(0)
-        train_idxs, test_idxs = np.split(np.random.permutation(2000), [1600])
+        # FIXME Changed temporarily due to limited RAM
+        # train_idxs, test_idxs = np.split(np.random.permutation(2000), [1600])
+        train_idxs, test_idxs = np.split(np.random.permutation(300), [250])
 
         if self.mode == 'train':
             idxs = train_idxs
@@ -118,8 +120,8 @@ class ShanghaiTechDataset(CrowdCountingDataset):
     """
     def __init__(self, *, part: str, **kwargs):
         """"""
-        super().__init__(**kwargs)
         self.part = part
+        super().__init__(**kwargs)
 
     def _load_data(self):
         """Load image data and ground-truth density maps."""
@@ -169,7 +171,7 @@ class UCF_CC_50Dataset(CrowdCountingDataset):
         gt_path = os.path.join(self.data_path, "density_maps.h5")
         
         np.random.seed(0)
-        train_idxs, test_idxs = np.split(np.random.permutation(50), [30])
+        train_idxs, test_idxs = np.split(np.random.permutation(50), [40])
 
         if self.mode == 'train':
             idxs = train_idxs

@@ -84,12 +84,16 @@ class Trainer(object):
                 loss = self.loss_metric(prediction, target)
 
                 if write_every is not None and t%write_every == 0:
-                    losses.append(loss)
+                    losses.append(loss.item())
 
                 # Perform one optimization step
                 self.optimizer.zero_grad()
                 loss.backward()
                 self.optimizer.step()
+
+                del loss, prediction
+
+            print(losses[-1])
 
             if validate_every:
                 validations[self.epoch] = self.validate_model(
@@ -119,7 +123,9 @@ class Trainer(object):
                 prediction = self.model(image)
 
                 for i, metric in enumerate(metrics):
-                    scores[i] += metric(prediction, target)
+                    scores[i] += metric(prediction, target).item()
+
+                del prediction
             
             scores /= t
 

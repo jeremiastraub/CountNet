@@ -1,28 +1,28 @@
 # Default configurations for training and validation
 ---
 CountNet:
-  depth: 2
+  depth: 5
   in_channels: 3
   out_channels: 1
-  fmaps: [8, 16]
+  fmaps: [16, 16, 32, 32, 32, 64]
 
 Trainer:
   optimizer:
     Adam:
-      lr: 0.001
+      lr: 0.0001
   loss_metric: MSELoss
   loader_train:
-    dataset: UCF_CC_50
-    batch_size: 4
+    dataset: ShanghaiTech_A # UCF_CC_50
+    batch_size: 8
     shuffle: True
   loader_test:
-    dataset: UCF_CC_50
+    dataset: ShanghaiTech_A # ShanghaiTech_A
     batch_size: 4
     shuffle: True
 
 training:
-  epochs: 1
-  write_every: 1
+  epochs: 12
+  write_every: 2
 
 validation:
   metrics:

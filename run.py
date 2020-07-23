@@ -37,7 +37,8 @@ if __name__ == '__main__':
             plt.plot(losses)
             plt.title('Loss')
             # plt.show() # opens separate window, pauses until it is closed
-            plt.savefig("output_loss.png")
+            plt.savefig("output_loss.png", bbox_inches='tight')
+            plt.close()
 
     if run_validation_cfg is not None:
         print("Starting validation...\n\nValidation configuration:\n"
@@ -54,14 +55,14 @@ if __name__ == '__main__':
     # Visualize a few predictions
     img_batch, dm_batch = next(iter(trainer.loader_test))
 
-    for i, _ in zip(range(2), range(img_batch.shape[0])):
+    for i, _ in zip(range(6), range(img_batch.shape[0])):
         img = img_batch[i,...]
         dm = dm_batch[i,...]
 
         plt.imshow(img.permute(1,2,0).numpy().squeeze())
-        plt.imshow(dm.permute(1,2,0).numpy().squeeze(), alpha=0.5)
+        plt.imshow(dm.permute(1,2,0).numpy().squeeze(), alpha=0.8)
         # plt.show()
-        plt.savefig(f"{i}_output_true.png")
+        plt.savefig(f"{i}_output_true.png", bbox_inches='tight')
         plt.close()
 
         res = trainer.model(img.unsqueeze(0)).detach()
@@ -73,9 +74,9 @@ if __name__ == '__main__':
 
         res = res.numpy().squeeze()
         plt.imshow(res, vmin=0)
-        plt.colorbar()
+        # plt.colorbar()
         # plt.show()
-        plt.savefig(f"{i}_output_res.png")
+        plt.savefig(f"{i}_output_res.png", bbox_inches='tight')
         plt.close()
 
         print(np.sum(dm.permute(1,2,0).numpy().squeeze()))
