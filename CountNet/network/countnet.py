@@ -39,10 +39,10 @@ class CountNet(EncoderDecoderSkeleton):
         f_in = self.merged_fmaps[depth]
         f_out = self.fmaps[0] if depth==0 else self.fmaps[depth-1]
         decoder = nn.Sequential(
-                Inception(f_in, f_out, dilation=2),
+                Inception(f_in, f_out, dilation=1),
+                nn.ReLU(),
+                Inception(f_out, f_out, dilation=2),
                 nn.ReLU()
-                # Inception(f_out, f_out, dilation=2),
-                # nn.ReLU()
             )
         return decoder 
 
@@ -50,6 +50,11 @@ class CountNet(EncoderDecoderSkeleton):
         return nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
 
     def construct_upsampling_module(self, depth):
+        # if depth=3:
+        #     f_in = 
+        # f_in = self.fmaps[self.depth]
+        # f_out = self.fmaps[self.depth-1]
+        # return nn.ConvTranspose2d(f_in, f_out, kernel_size=2, stride=2)
         return nn.Upsample(scale_factor=2)
 
     def construct_skip_module(self, depth):
@@ -61,10 +66,10 @@ class CountNet(EncoderDecoderSkeleton):
     def construct_base_module(self):
         f = self.fmaps[self.depth-1]
         base = nn.Sequential(
-                Inception(f, f),
+                nn.Conv2d(f, f, kernel_size=3, padding=1, padding_mode='reflect'),
                 nn.ReLU(),
-                Inception(f, f, dilation=2),
-                nn.ReLU()
+                nn.Conv2d(f, f, kernel_size=3, padding=1, padding_mode='reflect'),
+                nn.ReLU(),
             )
         return base
 
