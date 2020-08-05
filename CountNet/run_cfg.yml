@@ -19,12 +19,12 @@ Trainer:
     dataset: Mall # ShanghaiTech_A
     batch_size: 8
     shuffle: True
-  # write_to: output
-  # name_ext: small-mall
-  # load_from: output/200805-151200-small-mall
+  # tag_ext: small-mall
+  # load_from: 200805-151940-small-mall
+  # validate_run: 200805-151940-small-mall
 
 training:
-  epochs: 10
+  epochs: 1
   write_every: 1
 
 validation:

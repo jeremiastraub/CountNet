@@ -13,14 +13,17 @@ import torch
 
 class Trainer(object):
     """The Trainer takes care of training and validation of a model."""
+    OUTPUT_PATH = "output"
+
     def __init__(self, *, model,
                           optimizer,
                           loss_metric,
                           loader_train,
                           loader_test,
+                          validate_run: str=None,
                           load_from: str=None,
-                          write_to: str=None,
-                          name_ext: str=None):
+                          tag_ext: str=None,
+                          save_checkpoint=True):
         """
         Args:
             model: The model to train/validate
@@ -29,58 +32,72 @@ class Trainer(object):
                 density-map and the target map and returns the loss.
             loader_train: The data loader for the training set
             loader_test: The data loader for the test/validation set
-            load_from (str, optional): Path to a checkpoint to be loaded.
-            write_to (str, optional): Path to the output directory. If it is
-                None, no data is written.
-            name_ext (str, optional): Suffix for output folder-name
+            validate_run (str, optional): Tag of a previous to be validated.
+                If given, *no* new output tag is created (`load_from` must
+                match or be `None`).
+            load_from (str, optional): Tag of a previous run to be loaded
+            tag_ext (str, optional): Suffix for output folder tag
+            save_checkpoint (bool, optional): Whether to save the current model
+                and training configuration as a checkpoint
         """
         self.model = model
         self.optimizer = optimizer
         self.loss_metric = loss_metric
         self.loader_train = loader_train
         self.loader_test = loader_test
-        self.out_dir = None
+        self.save_checkpoint = save_checkpoint
         self.epoch = None
-        self.cfg = {}
 
-        # Create output directory
-        if write_to is not None:
-            name = datetime.now().strftime("%y%m%d-%H%M%S")
-            if name_ext is not None:
-                name += "-"+name_ext
-            out_dir = os.path.join(write_to, name)
-            os.makedirs(out_dir, exist_ok=True)
-            self.out_dir = out_dir
+        # Get output directory
+        if validate_run is not None:
+            out_dir = os.path.join(self.OUTPUT_PATH, validate_run)
 
-            # Assemble configuration dictionary which is written after training
-            model_cfg = {
-                'depth': self.model.depth,
-                'fmaps': self.model.fmaps,
-                'final_activation': self.model.final_activation
-            }
-            optimizer_cfg = {
-                'name': type(self.optimizer).__name__,
-                'learning_rate': self.optimizer.defaults['lr']
-            }
-            self.cfg = {
-                'model': model_cfg,
-                'optimizer': optimizer_cfg,
-                'loss_metric': type(self.loss_metric).__name__,
-                'load_from': load_from,
-                'train_dataset': type(self.loader_train.dataset).__name__,
-                'test_dataset': type(self.loader_test.dataset).__name__,
-                'batch_size': self.loader_train.batch_size
-            }
+        else:
+            tag = datetime.now().strftime("%y%m%d-%H%M%S")
+            if tag_ext is not None:
+                tag += "-" + tag_ext
+
+            out_dir = os.path.join(self.OUTPUT_PATH, tag)
+            os.makedirs(out_dir)
+
+        self.out_dir = out_dir
+        assert os.path.isdir(self.out_dir)
+
+        # Assemble configuration dictionary which is written after training
+        model_cfg = {
+            'depth': self.model.depth,
+            'fmaps': self.model.fmaps,
+            'final_activation': self.model.final_activation
+        }
+        optimizer_cfg = {
+            'name': type(self.optimizer).__name__,
+            'learning_rate': self.optimizer.defaults['lr']
+        }
+        self.cfg = {
+            'model': model_cfg,
+            'optimizer': optimizer_cfg,
+            'loss_metric': type(self.loss_metric).__name__,
+            'load_from': load_from,
+            'train_dataset': type(self.loader_train.dataset).__name__,
+            'test_dataset': type(self.loader_test.dataset).__name__,
+            'batch_size': self.loader_train.batch_size
+        }
 
         # Load checkpoint
-        if load_from is not None:
-            if not os.path.splitext(load_from)[1]:
-                load_from = os.path.join(load_from, "checkpoint.pt")
-            checkpoint = torch.load(load_from)
+        if load_from is not None or validate_run is not None:
+            if load_from is not None and validate_run is not None:
+                assert load_from == validate_run
+
+            load_path = (self.out_dir if validate_run is not None
+                         else os.path.join(self.OUTPUT_PATH, load_from))
+
+            if not os.path.splitext(load_path)[1]:
+                load_path = os.path.join(load_path, "checkpoint.pt")
+            checkpoint = torch.load(load_path)
             self.model.load_state_dict(checkpoint['model_state_dict'])
             self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
             self.epoch = checkpoint['epoch']
-            print(f"Loaded checkpoint at '{load_from}'.")
+            print(f"Loaded checkpoint at '{load_path}'.")
 
     def train_model(self, *, epochs: int=1,
                              write_every: int=None,
@@ -135,12 +152,12 @@ class Trainer(object):
             self.epoch += 1
 
         # Save checkpoint and the configurations
-        if self.out_dir is not None:
-            self.cfg['write_every'] = write_every
-            cfg_path = os.path.join(self.out_dir, 'configuration.yml')
-            with open(cfg_path, 'w') as file:
-                yaml.dump(self.cfg, file, default_flow_style=False)
+        self.cfg['write_every'] = write_every
+        cfg_path = os.path.join(self.out_dir, 'configuration.yml')
+        with open(cfg_path, 'w') as file:
+            yaml.dump(self.cfg, file, default_flow_style=False)
 
+        if self.save_checkpoint:
             checkpoint_path = os.path.join(self.out_dir, "checkpoint.pt")
             torch.save({
                 'epoch': self.epoch,
@@ -159,7 +176,7 @@ class Trainer(object):
             metrics (list): List of metrics to compute
         
         Returns:
-            array: metric scores evaluated on the test data
+            dict: metric scores evaluated on the test data keyed by name
         """
         # Dont't need the gradient information
         with torch.no_grad():
@@ -178,5 +195,19 @@ class Trainer(object):
                 del prediction
             
             scores /= t
+            validations = {(metric.__name__ if hasattr(metric, '__name__')
+                            else type(metric).__name__): float(s)
+                           for metric, s in zip(metrics, scores)}
 
-        return scores
+        validation_folder_path = os.path.join(self.out_dir, "validation")
+        os.makedirs(validation_folder_path, exist_ok=True)
+        tag = datetime.now().strftime("%y%m%d-%H%M%S")
+        validation_path = os.path.join(validation_folder_path, tag)
+        validation_path += ".yml"
+
+        validation_output = {k: v for k, v in validations.items()}
+        validation_output['test_dataset'] = type(self.loader_test.dataset).__name__
+        with open(validation_path, 'w') as file:
+            yaml.dump(validation_output, file, default_flow_style=False)
+
+        return validations

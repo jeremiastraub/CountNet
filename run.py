@@ -1,8 +1,4 @@
-"""Run script for CountNet training and validation"""
-
-from typing import Union
-
-from torch.utils.data import DataLoader
+"""Run script for CountNet training (and validation)"""
 
 from CountNet.utils import (load_yml, initialize_trainer,
                             parse_training_kwargs, parse_validation_kwargs)
@@ -49,7 +45,7 @@ if __name__ == '__main__':
         for m, s in zip(run_validation_cfg['metrics'], scores):
             print(f"{m}: {s}")
 
-    # FIXME This is only temporay!
+    # FIXME This is only temporary!
 
     # Visualize a few predictions
     img_batch, dm_batch = next(iter(trainer.loader_test))
