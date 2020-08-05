@@ -3,10 +3,10 @@
 _transforms: &transforms
   Compose:
     - Downscale_Image_GT:
-        downscaling_factor: 2
-        min_size: [256, 128]
+        downscaling_factor: 6 # 2
+        min_size: [64, 64] # [256, 128]
     - RandomCrop_Image_GT:
-        crop_size: [256, 128]
+        crop_size: [64, 64] # [256, 128]
     - ToTensor_Image_GT
 
 Mall:

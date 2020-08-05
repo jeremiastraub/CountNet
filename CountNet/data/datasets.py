@@ -88,7 +88,7 @@ class MallDataset(CrowdCountingDataset):
         np.random.seed(0)
         # FIXME Changed temporarily due to limited RAM
         # train_idxs, test_idxs = np.split(np.random.permutation(2000), [1600])
-        train_idxs, test_idxs = np.split(np.random.permutation(300), [250])
+        train_idxs, test_idxs = np.split(np.random.permutation(200), [150])
 
         if self.mode == 'train':
             idxs = train_idxs
