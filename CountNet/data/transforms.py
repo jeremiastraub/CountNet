@@ -68,21 +68,25 @@ class Downscale_Image_GT():
     Images are assumed to be of type PIL.Image.Image, density-maps are assumed
     to be of type np.ndarray (2d).
     """
-    def __init__(self, downscaling_factor: Union[int, Tuple[int]],
+    def __init__(self, downscaling_factor: Union[int, Tuple[int]]=None,
                        min_size: Union[int, Tuple[int]]=None):
         """
         Args:
-            downscaling_factor (Union[int, Tuple[int]]): The downscaling-factor
-                (in x-dir, in y-dir).
+            downscaling_factor (Union[int, Tuple[int]], optional): Downscaling
+                factor in (x-dir, y-dir). If `None`, the minimal downscaling
+                factor given `min_size` (required) is chosen automatically
+                (equal scaling in both directions).
             min_size (Union[int, Tuple[int]], optional): Minimum size of the
                 output image (width, height). If the transformed image would be
                 smaller than `min_size` in any dimension, the downscaling is
                 not applied.
         """
+        assert not (downscaling_factor is None and not min_size)
+
         if isinstance(downscaling_factor, int):
             downscaling_factor = (downscaling_factor, downscaling_factor, 1)
 
-        elif len(downscaling_factor) == 2:
+        elif downscaling_factor is not None and len(downscaling_factor) == 2:
             downscaling_factor = (downscaling_factor[0],
                                   downscaling_factor[1], 1)
 
@@ -98,19 +102,37 @@ class Downscale_Image_GT():
         assert isinstance(density_map, np.ndarray)
         assert density_map.ndim == 2
 
+        factors = self.downscaling_factor
+
         if self.min_size is not None:
-            if (   image.size[0]/2 < self.min_size[0]
-                or image.size[1]/2 < self.min_size[1]
-                ):
+            if self.downscaling_factor is None:
+                dsf_x = image.size[0] // self.min_size[0]
+                dsf_y = image.size[1] // self.min_size[1]
+
+                if dsf_x == 0 and dsf_y == 0:
+                    return image, density_map
+
+                if dsf_x == 0:
+                    dsf_x = 1
+
+                if dsf_y == 0:
+                    dsf_y = 1
+
+                dsf = min([dsf_x, dsf_y])
+                factors = (dsf, dsf, 1)
+
+            elif ( image.size[0]/self.downscaling_factor[0] < self.min_size[0]
+                or image.size[1]/self.downscaling_factor[1] < self.min_size[1]
+            ):
                 return image, density_map
 
         image = np.array(image)
-        img_red = downscale_local_mean(image, factors=self.downscaling_factor)
+        img_red = downscale_local_mean(image, factors=factors)
         img_red = Image.fromarray(img_red.astype('uint8'), mode='RGB')
 
         dm_norm = np.sum(density_map)
         density_map_red = downscale_local_mean(density_map,
-                                    factors=self.downscaling_factor[1::-1])
+                                               factors=factors[1::-1])
 
         # Rescale the density-map such that it sums to N
         density_map_red *= (dm_norm / np.sum(density_map_red))

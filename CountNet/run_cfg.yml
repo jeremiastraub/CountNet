@@ -17,10 +17,11 @@ Trainer:
     shuffle: True
   loader_test:
     dataset: Mall # ShanghaiTech_A
-    batch_size: 4
+    batch_size: 8
     shuffle: True
   # write_to: output
-  # load_from: output/...
+  # name_ext: small-mall
+  # load_from: output/200805-151200-small-mall
 
 training:
   epochs: 10
