@@ -3,6 +3,7 @@
 import os
 from datetime import datetime
 
+import yaml
 import numpy as np
 from tqdm import tqdm
 
@@ -17,6 +18,7 @@ class Trainer(object):
                           loss_metric,
                           loader_train,
                           loader_test,
+                          load_from: str=None,
                           write_to: str=None,
                           name_ext: str=None):
         """
@@ -27,6 +29,7 @@ class Trainer(object):
                 density-map and the target map and returns the loss.
             loader_train: The data loader for the training set
             loader_test: The data loader for the test/validation set
+            load_from (str, optional): Path to a checkpoint to be loaded.
             write_to (str, optional): Path to the output directory. If it is
                 None, no data is written.
             name_ext (str, optional): Suffix for output folder-name
@@ -36,22 +39,52 @@ class Trainer(object):
         self.loss_metric = loss_metric
         self.loader_train = loader_train
         self.loader_test = loader_test
-        self.out_path = None
+        self.out_dir = None
         self.epoch = None
+        self.cfg = {}
 
         # Create output directory
-        # TODO Also write the configuration at some point
         if write_to is not None:
             name = datetime.now().strftime("%y%m%d-%H%M%S")
             if name_ext is not None:
                 name += "-"+name_ext
-            out_path = os.path.join(write_to, name)
-            os.makedirs(out_path, exist_ok=True)
-            self.out_path = out_path
+            out_dir = os.path.join(write_to, name)
+            os.makedirs(out_dir, exist_ok=True)
+            self.out_dir = out_dir
+
+            # Assemble configuration dictionary which is written after training
+            model_cfg = {
+                'depth': self.model.depth,
+                'fmaps': self.model.fmaps,
+                'final_activation': self.model.final_activation
+            }
+            optimizer_cfg = {
+                'name': type(self.optimizer).__name__,
+                'learning_rate': self.optimizer.defaults['lr']
+            }
+            self.cfg = {
+                'model': model_cfg,
+                'optimizer': optimizer_cfg,
+                'loss_metric': type(self.loss_metric).__name__,
+                'load_from': load_from,
+                'train_dataset': type(self.loader_train.dataset).__name__,
+                'test_dataset': type(self.loader_test.dataset).__name__,
+                'batch_size': self.loader_train.batch_size
+            }
+
+        # Load checkpoint
+        if load_from is not None:
+            if not os.path.splitext(load_from)[1]:
+                load_from = os.path.join(load_from, "checkpoint.pt")
+            checkpoint = torch.load(load_from)
+            self.model.load_state_dict(checkpoint['model_state_dict'])
+            self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+            self.epoch = checkpoint['epoch']
+            print(f"Loaded checkpoint at '{load_from}'.")
 
     def train_model(self, *, epochs: int=1,
                              write_every: int=None,
-                             validate_every: bool=False,
+                             validate_every_epoch: bool=False,
                              validation_metrics: list=None):
         """Trains the model.
         
@@ -59,17 +92,18 @@ class Trainer(object):
             epochs (int, optional): The number of epochs to train for
             write_every (int, optional): If not None, store and return losses
                 in equidistant intervals.
-            validate_every (bool, optional): Whether to validate the model
-                after every epoch.
+            validate_every_epoch (bool, optional): Whether to validate the
+                model after every epoch.
             validation_metrics (list, optional): The metrics used for
-                validation if validate_every=True.
+                validation if validate_every_epoch=True.
         
         Returns:
             Tuple[list, dict]: Losses for different training iterations, dict
-            of validation scores keyed by epoch (if validate_every=True).
+            of validation scores keyed by epoch (if validate_every_epoch=True).
         """
-        losses = []
         validations = dict()
+        losses = []
+
         if self.epoch is None:
             self.epoch = 1
         
@@ -93,12 +127,28 @@ class Trainer(object):
 
                 del loss, prediction
 
-            print(losses[-1])
+            print("\nCurrent loss: ", losses[-1])
 
-            if validate_every:
+            if validate_every_epoch:
                 validations[self.epoch] = self.validate_model(
                                                     metrics=validation_metrics)
             self.epoch += 1
+
+        # Save checkpoint and the configurations
+        if self.out_dir is not None:
+            self.cfg['write_every'] = write_every
+            cfg_path = os.path.join(self.out_dir, 'configuration.yml')
+            with open(cfg_path, 'w') as file:
+                yaml.dump(self.cfg, file, default_flow_style=False)
+
+            checkpoint_path = os.path.join(self.out_dir, "checkpoint.pt")
+            torch.save({
+                'epoch': self.epoch,
+                'losses': losses,
+                'validations': validations,
+                'model_state_dict': self.model.state_dict(),
+                'optimizer_state_dict': self.optimizer.state_dict()
+                }, checkpoint_path)
 
         return losses, validations
 

@@ -34,9 +34,8 @@ if __name__ == '__main__':
         # Plot losses over training iteration
         import matplotlib.pyplot as plt
         if losses:
-            plt.plot(losses[3:])
+            plt.plot(losses[2:])
             plt.title('Loss')
-            # plt.show() # opens separate window, pauses until it is closed
             plt.savefig("output_loss.png", bbox_inches='tight')
             plt.close()
 
@@ -61,7 +60,6 @@ if __name__ == '__main__':
 
         plt.imshow(img.permute(1,2,0).numpy().squeeze())
         plt.imshow(dm.permute(1,2,0).numpy().squeeze(), alpha=0.8)
-        # plt.show()
         plt.savefig(f"{i}_output_true.png", bbox_inches='tight')
         plt.close()
 
@@ -74,10 +72,8 @@ if __name__ == '__main__':
 
         res = res.numpy().squeeze()
         plt.imshow(res, vmin=0)
-        # plt.colorbar()
-        # plt.show()
         plt.savefig(f"{i}_output_res.png", bbox_inches='tight')
         plt.close()
 
-        print(np.sum(dm.permute(1,2,0).numpy().squeeze()))
-        print(np.sum(res))
+        print("True sum: ", np.sum(dm.permute(1,2,0).numpy().squeeze()))
+        print("Prediction: ", np.sum(res))

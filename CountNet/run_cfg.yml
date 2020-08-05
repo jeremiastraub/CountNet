@@ -19,10 +19,12 @@ Trainer:
     dataset: Mall # ShanghaiTech_A
     batch_size: 4
     shuffle: True
+  # write_to: output
+  # load_from: output/...
 
 training:
   epochs: 10
-  write_every: 2
+  write_every: 1
 
 validation:
   metrics:
