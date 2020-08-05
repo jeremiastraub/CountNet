@@ -34,7 +34,7 @@ if __name__ == '__main__':
         # Plot losses over training iteration
         import matplotlib.pyplot as plt
         if losses:
-            plt.plot(losses[2:])
+            plt.plot(losses[4:])
             plt.title('Loss')
             plt.savefig("output_loss.png", bbox_inches='tight')
             plt.close()
