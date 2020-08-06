@@ -49,6 +49,12 @@ class Trainer(object):
         self.save_checkpoint = save_checkpoint
         self.epoch = None
 
+        if torch.cuda.is_available():
+            self.device = torch.device('cuda')
+        else:
+            print("\nNo GPU available. Using CPU...")
+            self.device = torch.device('cpu')
+
         # Get output directory
         if validate_run is not None:
             out_dir = os.path.join(self.OUTPUT_PATH, validate_run)
@@ -87,7 +93,7 @@ class Trainer(object):
             'test_batch_size': self.loader_test.batch_size
         }
 
-        # Load checkpoint
+        # Load checkpoint if needed
         if load_from is not None or validate_run is not None:
             if load_from is not None and validate_run is not None:
                 assert load_from == validate_run
@@ -122,6 +128,7 @@ class Trainer(object):
             Tuple[list, dict]: Losses for different training iterations, dict
             of validation scores keyed by epoch (if validate_every_epoch=True).
         """
+        model = self.model.to(device=self.device)
         validations = dict()
         losses = []
 
@@ -133,9 +140,11 @@ class Trainer(object):
                                                      leave=False,
                                                      desc="Epoch "
                                                           f"{self.epoch}")):
-                self.model.train()
+                model.train()
+                image = image.to(device=self.device)
+                target = target.to(device=self.device)
 
-                prediction = self.model(image)
+                prediction = model(image)
                 loss = self.loss_metric(prediction, target)
 
                 if write_every is not None and t%write_every == 0:
@@ -167,7 +176,7 @@ class Trainer(object):
                 'epoch': self.epoch,
                 'losses': losses,
                 'validations': validations,
-                'model_state_dict': self.model.state_dict(),
+                'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': self.optimizer.state_dict()
                 }, checkpoint_path)
 
@@ -182,6 +191,7 @@ class Trainer(object):
         Returns:
             dict: metric scores evaluated on the test data keyed by name
         """
+        self.model.eval()
         # Dont't need the gradient information
         with torch.no_grad():
             # Accumulate the metric scores here and average across the data
@@ -189,7 +199,8 @@ class Trainer(object):
 
             for t, (image, target) in enumerate(tqdm(self.loader_test,
                                                      desc="Validation:")):
-                self.model.eval()
+                image = image.to(device=self.device)
+                target = target.to(device=self.device)
                 
                 prediction = self.model(image)
 
