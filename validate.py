@@ -7,19 +7,14 @@ from CountNet.utils import (load_yml, initialize_trainer,
 # Change these paths to load the configurations from different files
 DATASET_CFG_PATH = "CountNet/data/datasets_cfg.yml"
 RUN_CFG_PATH = "CountNet/run_cfg.yml"
-VALIDATION_CFG_PATH = "CountNet/validation_cfg.yml"
 
 # -----------------------------------------------------------------------------
 # Get the configurations
 datasets_cfg = load_yml(DATASET_CFG_PATH)
 run_cfg = load_yml(RUN_CFG_PATH)
-validation_cfg = (load_yml(VALIDATION_CFG_PATH) if VALIDATION_CFG_PATH
-                  else run_cfg.get('validation', None))
+validation_cfg = run_cfg.get('validation', None)
 
-if validation_cfg is None:
-    raise ValueError("No validation configuration found! Either provide a "
-                     "separate validation cfg or a 'validation' entry within "
-                     "the run cfg.")
+assert validation_cfg is not None, "No validation configuration found!"
 
 model_cfg = run_cfg['CountNet']
 trainer_cfg = run_cfg['Trainer']
