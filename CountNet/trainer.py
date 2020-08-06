@@ -24,7 +24,8 @@ class Trainer(object):
                           load_from: str=None,
                           tag_ext: str=None,
                           save_checkpoint=True):
-        """
+        """Initializes a Trainer.
+        
         Args:
             model: The model to train/validate
             optimizer: The (initialized) optimizer object
@@ -78,9 +79,12 @@ class Trainer(object):
             'optimizer': optimizer_cfg,
             'loss_metric': type(self.loss_metric).__name__,
             'load_from': load_from,
-            'train_dataset': type(self.loader_train.dataset).__name__,
+            'train_dataset': (type(self.loader_train.dataset).__name__
+                              if self.loader_train is not None else None),
             'test_dataset': type(self.loader_test.dataset).__name__,
-            'batch_size': self.loader_train.batch_size
+            'train_batch_size': (self.loader_train.batch_size
+                                 if self.loader_train is not None else None),
+            'test_batch_size': self.loader_test.batch_size
         }
 
         # Load checkpoint

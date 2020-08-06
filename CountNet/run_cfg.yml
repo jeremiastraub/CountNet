@@ -1,4 +1,4 @@
-# Default configurations for training and validation
+# Default configurations for training (and subsequent validation)
 ---
 CountNet:
   depth: 2
@@ -21,7 +21,7 @@ Trainer:
     shuffle: True
   # tag_ext: small-mall
   # load_from: 200805-151940-small-mall
-  # validate_run: 200805-151940-small-mall
+  validate_run: 200805-151940-small-mall
 
 training:
   epochs: 1

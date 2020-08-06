@@ -1,0 +1,4 @@
+# Default configurations for validation
+---
+metrics:
+  - MSELoss
