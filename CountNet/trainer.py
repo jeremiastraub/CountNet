@@ -105,6 +105,11 @@ class Trainer(object):
                 load_path = os.path.join(load_path, "checkpoint.pt")
             checkpoint = torch.load(load_path)
             self.model.load_state_dict(checkpoint['model_state_dict'])
+            if self.device == torch.device('cuda'):
+                self.model = self.model.to(device=self.device)
+                lr = self.optimizer.defaults['lr']
+                self.optimizer = type(self.optimizer)(
+                                        params=self.model.parameters(), lr=lr)
             self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
             self.epoch = checkpoint['epoch']
             print(f"Loaded checkpoint at '{load_path}'.")
@@ -128,7 +133,7 @@ class Trainer(object):
             Tuple[list, dict]: Losses for different training iterations, dict
             of validation scores keyed by epoch (if validate_every_epoch=True).
         """
-        self.model.to(device=self.device)
+        self.model = self.model.to(device=self.device)
         validations = dict()
         losses = []
 
@@ -176,7 +181,7 @@ class Trainer(object):
                 'epoch': self.epoch,
                 'losses': losses,
                 'validations': validations,
-                'model_state_dict': model.state_dict(),
+                'model_state_dict': self.model.state_dict(),
                 'optimizer_state_dict': self.optimizer.state_dict()
                 }, checkpoint_path)
 
@@ -191,7 +196,7 @@ class Trainer(object):
         Returns:
             dict: metric scores evaluated on the test data keyed by name
         """
-        self.model.to(device=self.device)
+        self.model = self.model.to(device=self.device)
         self.model.eval()
         # Dont't need the gradient information
         with torch.no_grad():
