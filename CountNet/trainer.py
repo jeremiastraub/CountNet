@@ -106,13 +106,16 @@ class Trainer(object):
             checkpoint = torch.load(load_path)
             self.model.load_state_dict(checkpoint['model_state_dict'])
             if self.device == torch.device('cuda'):
+                # NOTE Workaround if loading a checkpoint while using a GPU.
+                #      In that case, the optimizer needs to be re-initialized
+                #      after the model was moved to the 'cuda' device.
                 self.model = self.model.to(device=self.device)
                 lr = self.optimizer.defaults['lr']
                 self.optimizer = type(self.optimizer)(
                                         params=self.model.parameters(), lr=lr)
             self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
             self.epoch = checkpoint['epoch']
-            print(f"Loaded checkpoint at '{load_path}'.")
+            print(f"\nLoaded checkpoint at '{load_path}'.")
 
     def train_model(self, *, epochs: int=1,
                              write_every: int=None,

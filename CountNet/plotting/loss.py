@@ -2,7 +2,7 @@
 
 from typing import List
 import matplotlib.pyplot as plt
-from CountNet.plotting import extract_loss_information
+from .plot_utils import extract_loss_information
 
 # -----------------------------------------------------------------------------
 

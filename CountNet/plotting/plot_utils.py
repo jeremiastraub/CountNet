@@ -21,7 +21,8 @@ def extract_loss_information(tag: str, datapath: str):
     """
     path = os.path.join(datapath, tag)
 
-    checkpoint = torch.load(os.path.join(path, "checkpoint.pt"))
+    checkpoint = torch.load(os.path.join(path, "checkpoint.pt"),
+                            map_location=torch.device('cpu'))
     loss = checkpoint['losses']
     epoch = checkpoint['epoch'] - 1
     steps = list(np.linspace(0, epoch, len(loss)))
