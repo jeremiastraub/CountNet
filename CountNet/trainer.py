@@ -128,7 +128,7 @@ class Trainer(object):
             Tuple[list, dict]: Losses for different training iterations, dict
             of validation scores keyed by epoch (if validate_every_epoch=True).
         """
-        model = self.model.to(device=self.device)
+        self.model.to(device=self.device)
         validations = dict()
         losses = []
 
@@ -140,11 +140,11 @@ class Trainer(object):
                                                      leave=False,
                                                      desc="Epoch "
                                                           f"{self.epoch}")):
-                model.train()
+                self.model.train()
                 image = image.to(device=self.device)
                 target = target.to(device=self.device)
 
-                prediction = model(image)
+                prediction = self.model(image)
                 loss = self.loss_metric(prediction, target)
 
                 if write_every is not None and t%write_every == 0:
@@ -191,6 +191,7 @@ class Trainer(object):
         Returns:
             dict: metric scores evaluated on the test data keyed by name
         """
+        self.model.to(device=self.device)
         self.model.eval()
         # Dont't need the gradient information
         with torch.no_grad():

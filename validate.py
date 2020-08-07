@@ -41,6 +41,7 @@ if __name__ == '__main__':
     import numpy as np
     import matplotlib.pyplot as plt
     print("One example batch:...")
+    trainer.model.to(device='cpu')
     for i, _ in zip(range(6), range(img_batch.shape[0])):
         img = img_batch[i,...]
         dm = dm_batch[i,...]
