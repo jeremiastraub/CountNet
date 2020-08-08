@@ -103,7 +103,13 @@ class Trainer(object):
 
             if not os.path.splitext(load_path)[1]:
                 load_path = os.path.join(load_path, "checkpoint.pt")
-            checkpoint = torch.load(load_path)
+
+            if self.device == torch.device('cpu'):
+                checkpoint = torch.load(load_path,
+                                        map_location=torch.device('cpu'))
+            else:
+                checkpoint = torch.load(load_path)
+
             self.model.load_state_dict(checkpoint['model_state_dict'])
             if self.device == torch.device('cuda'):
                 # NOTE Workaround if loading a checkpoint while using a GPU.
@@ -174,6 +180,7 @@ class Trainer(object):
 
         # Save checkpoint and the configurations
         self.cfg['write_every'] = write_every
+        self.cfg['current_epoch'] = self.epoch - 1
         cfg_path = os.path.join(self.out_dir, 'configuration.yml')
         with open(cfg_path, 'w') as file:
             yaml.dump(self.cfg, file, default_flow_style=False)
@@ -218,10 +225,12 @@ class Trainer(object):
 
                 del prediction
             
-            scores /= t
-            validations = {(metric.__name__ if hasattr(metric, '__name__')
-                            else type(metric).__name__): float(s)
-                           for metric, s in zip(metrics, scores)}
+        scores /= t
+        validations = {(metric.__name__ if hasattr(metric, '__name__')
+                        else type(metric).__name__): float(s)
+                       for metric, s in zip(metrics, scores)}
+        if 'MSE' in validations:
+            validations['RMSE'] = float(np.sqrt(validations['MSE']))
 
         validation_folder_path = os.path.join(self.out_dir, "validation")
         os.makedirs(validation_folder_path, exist_ok=True)

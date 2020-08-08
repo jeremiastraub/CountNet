@@ -37,14 +37,14 @@ class CountNet(EncoderDecoderSkeleton):
         f_in = self.merged_fmaps[depth]
         f_out = self.fmaps[0] if depth==0 else self.fmaps[depth-1]
         decoder = nn.Sequential(
-                # Inception(f_in, f_out, dilation=1),
-                # nn.ReLU(),
-                # Inception(f_out, f_out, dilation=2),
-                # nn.ReLU(),
-                nn.Conv2d(f_in, f_out, kernel_size=3, padding=1, padding_mode='reflect'),
+                Inception(f_in, f_out, dilation=1),
                 nn.ReLU(),
-                nn.Conv2d(f_out, f_out, kernel_size=3, padding=1, padding_mode='reflect'),
+                Inception(f_out, f_out, dilation=2),
                 nn.ReLU(),
+                # nn.Conv2d(f_in, f_out, kernel_size=3, padding=1, padding_mode='reflect'),
+                # nn.ReLU(),
+                # nn.Conv2d(f_out, f_out, kernel_size=3, padding=1, padding_mode='reflect'),
+                # nn.ReLU(),
             )
         return decoder 
 

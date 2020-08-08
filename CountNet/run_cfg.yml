@@ -1,10 +1,10 @@
 # Default configurations for training (and subsequent validation)
 ---
 CountNet:
-  depth: 2
+  depth: 4
   in_channels: 3
   out_channels: 1
-  fmaps: [64, 64, 64]
+  fmaps: [32, 64, 64, 128, 256]
 
 Trainer:
   optimizer:
@@ -21,7 +21,7 @@ Trainer:
     shuffle: True
   # tag_ext: small-mall
   # load_from: 200805-151940-small-mall
-  # validate_run: 200805-151940-small-mall
+  validate_run: 200808-105632-mall-inception-depth4-256ft
 
 training:
   epochs: 1
@@ -29,4 +29,7 @@ training:
 
 validation:
   metrics:
-    - MSELoss
+    - MAE
+    - MSE
+    - PSNR
+    - GAME
