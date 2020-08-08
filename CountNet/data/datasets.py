@@ -86,9 +86,8 @@ class MallDataset(CrowdCountingDataset):
         gt_path = os.path.join(self.data_path, "density_maps.h5")
         
         np.random.seed(0)
-        # FIXME Changed temporarily due to limited RAM
-        # train_idxs, test_idxs = np.split(np.random.permutation(2000), [1600])
-        train_idxs, test_idxs = np.split(np.random.permutation(400), [350])
+        train_idxs, test_idxs = np.split(np.random.permutation(2000), [1600])
+        # train_idxs, test_idxs = np.split(np.random.permutation(400), [350])
 
         if self.mode == 'train':
             idxs = train_idxs
