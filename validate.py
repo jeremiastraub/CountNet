@@ -53,7 +53,7 @@ if __name__ == '__main__':
 
         res = trainer.model(img.unsqueeze(0)).detach()
 
-        mse = nn.MSELoss(reduction='sum')
+        mse = nn.MSELoss()
         print("MSE: ", mse(res.squeeze(), dm.squeeze()).item())
 
         res = res.numpy().squeeze()

@@ -174,6 +174,7 @@ class Trainer(object):
 
         # Save checkpoint and the configurations
         self.cfg['write_every'] = write_every
+        self.cfg['current_epoch'] = self.epoch - 1
         cfg_path = os.path.join(self.out_dir, 'configuration.yml')
         with open(cfg_path, 'w') as file:
             yaml.dump(self.cfg, file, default_flow_style=False)
