@@ -29,8 +29,7 @@ training:
 
 validation:
   metrics:
-    - MSELoss
-    - L1Loss
-    - RMSE
+    - MAE
+    - MSE
     - PSNR
-    # - SSIM
+    - GAME

@@ -225,10 +225,12 @@ class Trainer(object):
 
                 del prediction
             
-            scores /= t
-            validations = {(metric.__name__ if hasattr(metric, '__name__')
-                            else type(metric).__name__): float(s)
-                           for metric, s in zip(metrics, scores)}
+        scores /= t
+        validations = {(metric.__name__ if hasattr(metric, '__name__')
+                        else type(metric).__name__): float(s)
+                       for metric, s in zip(metrics, scores)}
+        if 'MSE' in validations:
+            validations['RMSE'] = float(np.sqrt(validations['MSE']))
 
         validation_folder_path = os.path.join(self.out_dir, "validation")
         os.makedirs(validation_folder_path, exist_ok=True)
