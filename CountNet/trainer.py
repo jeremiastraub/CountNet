@@ -103,7 +103,13 @@ class Trainer(object):
 
             if not os.path.splitext(load_path)[1]:
                 load_path = os.path.join(load_path, "checkpoint.pt")
-            checkpoint = torch.load(load_path)
+
+            if self.device == torch.device('cpu'):
+                checkpoint = torch.load(load_path,
+                                        map_location=torch.device('cpu'))
+            else:
+                checkpoint = torch.load(load_path)
+
             self.model.load_state_dict(checkpoint['model_state_dict'])
             if self.device == torch.device('cuda'):
                 # NOTE Workaround if loading a checkpoint while using a GPU.

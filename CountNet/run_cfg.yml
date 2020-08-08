@@ -21,7 +21,7 @@ Trainer:
     shuffle: True
   # tag_ext: small-mall
   # load_from: 200805-151940-small-mall
-  # validate_run: 200805-151940-small-mall
+  validate_run: 200808-074542-mall-inception
 
 training:
   epochs: 1
