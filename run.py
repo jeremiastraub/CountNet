@@ -25,16 +25,7 @@ if __name__ == '__main__':
     if run_training_cfg is not None:
         print(f"Starting training...\n\nModel configuration:\n{model_cfg}\n\n"
               f"Training configuration:\n{run_training_cfg}\n")
-        losses, _ = trainer.train_model(
-                                **parse_training_kwargs(run_training_cfg))
-
-        # Plot losses over training iteration
-        import matplotlib.pyplot as plt
-        if losses:
-            plt.plot(losses[4:])
-            plt.title('Loss')
-            plt.savefig("output_loss.png", bbox_inches='tight')
-            plt.close()
+        _ = trainer.train_model(**parse_training_kwargs(run_training_cfg))
 
     if run_validation_cfg is not None:
         print("Starting validation...\n\nValidation configuration:\n"
