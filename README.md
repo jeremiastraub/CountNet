@@ -3,7 +3,7 @@ Using supervised deep learning to count people in images. The CountNet model is 
 
 
 ## Datasets
-This repository includes four ready-to-use datasets. Any new dataset requires its own data-loading function (see [datasets.py](CountNet/data/datasets.py)). So far, the CountNet model could only be trained successfully on the *Mall* dataset.
+This repository includes four ready-to-use datasets. Any new dataset requires its own derived dataset class (see [datasets.py](CountNet/data/datasets.py)). So far, the CountNet model could only be trained successfully on the *Mall* dataset.
 
 - **Mall**: has diverse illumination conditions and crowd densities. Moreover, the scene contained in the dataset has severe perspective distortion. The dataset also presents severe occlusions. The video sequence in the dataset consists of 2000 frames of size 640x480 with 6000 instances of labeled pedestrians split into training (1600) and evaluation set (400).
 - **UCF_CC_50**: includes a wide range of densities and diverse scenes with varying perspective distortion. It contains a total of 50 images with an average of 1280 individuals per image. Due to the limited number of images is recommended to define a cross-validation protocol for training and testing. However, it is currently split into training (40) and test (10) set.
@@ -11,7 +11,7 @@ This repository includes four ready-to-use datasets. Any new dataset requires it
 
 
 ## Generating ground-truth
-Before training the model the first time, the ground-truth density maps need to be created. These are not included in this repository as they take up disk space of around 1GB (when creating them for all four datasets). We provide a [script](CountNet/datasets/generate_density_maps.py) for automatic ground-truth generation. Run it via
+Before training the model the first time, the ground-truth density maps need to be created. These are not included in this repository as they take up disk space of around 1GB (when creating them for all four datasets). We provide a [script](CountNet/datasets/generate_density_maps.py) for automatic ground-truth generation. Run it via:
 
 ```bash
 cd CountNet/datasets
@@ -21,7 +21,7 @@ python generate_density_maps.py
 
 
 ## Configuration
-We aimed at designing the project such that the pipeline of configuring the datasets and training, starting a training run, and evaluating previous runs is easy to use and that results are reproducible. For example, we use the \texttt{YAML} language for most configurations, which makes it easy to adjust parameters and configurations are stored alongside with model output.
+We aimed at designing the project such that the pipeline of configuring the datasets and training, starting a training run, and evaluating previous runs is easy to use and that results are reproducible. For example, we use the YAML language for most configurations, which makes it easy to adjust parameters and configurations are stored alongside with model output.
 
 The preprocessing transformations applied to the image data (e.g., downscaling, random crops) can be configured in [the dataset configuration](CountNet/data/datasets_cfg.yml)
 
@@ -29,7 +29,7 @@ The core of the training and validation configuration is the [run configuration]
 
 
 ## Training the model
-Start a training run via
+Start a training run via:
 
 ```bash
 python run.py
