@@ -5,12 +5,6 @@ import numpy
 from numpy.lib.stride_tricks import as_strided as ast
 
 # -----------------------------------------------------------------------------
-
-def _error(x, y):
-    """ Simple error """
-    return x - y
-
-# -----------------------------------------------------------------------------
 """Image-level metrics"""
 
 def MAE(x, y):
@@ -64,11 +58,13 @@ def PRMSE(x, y):
     raise NotImplementedError()
 
 # -----------------------------------------------------------------------------
-"""Pixel-level metrics
-Tip: http://stackoverflow.com/a/5078155/1828289
-"""
+"""Pixel-level metrics"""
 
-def block_view(A, block=(3, 3)):
+def _error(x, y):
+    """ Simple error """
+    return x - y
+
+def _block_view(A, block=(3, 3)):
     """Provide a 2D block view to 2D array. No error checking made.
     Therefore meaningful (as implemented) only for blocks strictly
     compatible with the shape of A."""
@@ -79,13 +75,16 @@ def block_view(A, block=(3, 3)):
     return ast(A, shape=shape, strides=strides)
 
 def SSIM(x, y, C1=0.01 ** 2, C2=0.03 ** 2):
-    """Structural Similarity Index"""
+    """Structural Similarity Index
+
+    Adapted from: http://stackoverflow.com/a/5078155/1828289
+    """
     assert isinstance(x, torch.Tensor)
     assert isinstance(y, torch.Tensor)
     assert x.ndim == 4 and y.ndim == 4
 
-    bimg1 = block_view(x, (11, 11))
-    bimg2 = block_view(y, (11, 11))
+    bimg1 = _block_view(x, (11, 11))
+    bimg2 = _block_view(y, (11, 11))
     s1 = numpy.sum(bimg1, (-1, -2))
     s2 = numpy.sum(bimg2, (-1, -2))
     ss = numpy.sum(bimg1 * bimg1, (-1, -2)) + numpy.sum(bimg2 * bimg2, (-1, -2))

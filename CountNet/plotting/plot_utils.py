@@ -1,4 +1,4 @@
-"""Utility functions for plotting"""
+"""Utility functions for evaluation and plotting"""
 
 import os
 import torch
@@ -91,9 +91,6 @@ def load_trainer(path_run_cfg: str,
     
     Returns:
         The Trainer
-    
-    Raises:
-        ValueError: Description
     """
     # Get the configurations
     datasets_cfg = load_yml(path_dataset_cfg)
