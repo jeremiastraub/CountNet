@@ -1,6 +1,9 @@
 # Ground-truth density maps
 density_maps.h5
 
+# Output directory
+output/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

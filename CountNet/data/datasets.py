@@ -99,17 +99,15 @@ class MallDataset(CrowdCountingDataset):
                       desc=f"Loading '{os.path.split(self.data_path)[1]}' "
                            f"{self.mode}ing data..."):
             # Load image
-            img = Image.open(img_path.format(idx=i+1))
-            if img.mode == 'L':
-                img = img.convert('RGB')
+            with Image.open(img_path.format(idx=i+1)) as img:
+                if img.mode == 'L':
+                    img = img.convert('RGB')
+                images.append(img.copy())
 
             # Load density map
             with h5py.File(gt_path, 'r') as f:
                 dm = f[str(i+1)][()]
-            
-            # Store both
-            images.append(img)
-            gt.append(dm.T)
+                gt.append(dm.T)
 
         return images, gt
 
@@ -120,8 +118,8 @@ class ShanghaiTechDataset(CrowdCountingDataset):
     """
     def __init__(self, *, part: str, **kwargs):
         """"""
-        super().__init__(**kwargs)
         self.part = part
+        super().__init__(**kwargs)
 
     def _load_data(self):
         """Load image data and ground-truth density maps."""
@@ -148,17 +146,15 @@ class ShanghaiTechDataset(CrowdCountingDataset):
                       desc=f"Loading '{os.path.split(self.data_path)[1]}' "
                            f"{self.mode}ing data..."):
             # Load image
-            img = Image.open(img_path.format(idx=i+1))
-            if img.mode == 'L':
-                img = img.convert('RGB')
+            with Image.open(img_path.format(idx=i+1)) as img:
+                if img.mode == 'L':
+                    img = img.convert('RGB')
+                images.append(img.copy())
 
             # Load density map
             with h5py.File(gt_path, 'r') as f:
                 dm = f[str(i+1)][()]
-            
-            # Store both
-            images.append(img)
-            gt.append(dm.T)
+                gt.append(dm.T)
 
         return images, gt
 
@@ -173,7 +169,7 @@ class UCF_CC_50Dataset(CrowdCountingDataset):
         gt_path = os.path.join(self.data_path, "density_maps.h5")
         
         np.random.seed(0)
-        train_idxs, test_idxs = np.split(np.random.permutation(50), [30])
+        train_idxs, test_idxs = np.split(np.random.permutation(50), [40])
 
         if self.mode == 'train':
             idxs = train_idxs
@@ -186,16 +182,14 @@ class UCF_CC_50Dataset(CrowdCountingDataset):
                       desc=f"Loading '{os.path.split(self.data_path)[1]}' "
                            f"{self.mode}ing data..."):
             # Load image
-            img = Image.open(img_path.format(idx=i+1))
-            if img.mode == 'L':
-                img = img.convert('RGB')
+            with Image.open(img_path.format(idx=i+1)) as img:
+                if img.mode == 'L':
+                    img = img.convert('RGB')
+                images.append(img.copy())
 
             # Load density map
             with h5py.File(gt_path, 'r') as f:
                 dm = f[str(i+1)][()]
-            
-            # Store both
-            images.append(img)
-            gt.append(dm.T)
+                gt.append(dm.T)
 
         return images, gt

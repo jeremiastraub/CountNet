@@ -1,29 +1,44 @@
-# Default configurations for training and validation
+# Default configurations for training (and subsequent validation)
 ---
 CountNet:
-  depth: 2
+  depth: 3
   in_channels: 3
   out_channels: 1
-  fmaps: [8, 16]
-
+  fmaps: [64, 64, 128, 256]     # number of features on the different
+                                # depth levels (from top to bottom)
 Trainer:
   optimizer:
-    SGD:
-      lr: 0.005
+    Adam:
+      lr: 0.001
   loss_metric: MSELoss
   loader_train:
-    dataset: UCF_CC_50
-    batch_size: 4
+    dataset: Mall               # Can also be: UCF_CC_50, ShanghaiTech_A (or B)
+    batch_size: 8
     shuffle: True
   loader_test:
-    dataset: UCF_CC_50
-    batch_size: 4
+    dataset: Mall
+    batch_size: 1
     shuffle: True
+  tag_ext: my-training-run      # Use this to add a descriptive extension to
+                                # the output tag (appended to the time stamp)
+  # load_from: 200805-151940    # Specify `load_from` to continue training from
+                                # a previous checkpoint
+  # validate_run: 200805-151940 # Needs to be specified for validation via
+                                # validate.py
 
 training:
   epochs: 1
-  write_every: 1
+  write_every: 1                # How often the loss is written
+  validate_every_epoch: True,
+  validation_metrics:           # If `validate_every_epoch` is True, use these
+    - MAE                       # metrics to validate the model after every
+    - MSE                       # epoch
+    - PSNR
+    - GAME
 
-validation:
+validation:                     # Used in validate.py
   metrics:
-    - MSELoss
+    - MAE
+    - MSE
+    - PSNR
+    - GAME

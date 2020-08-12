@@ -73,6 +73,9 @@ def initialize_dataset(name: str, cfg: dict, mode: str):
 
 def initialize_data_loader(cfg: dict, dset_cfg: dict, mode: str):
     """Creates a DataLoader."""
+    if cfg is None:
+        return None
+    
     dset_cfg = copy.deepcopy(dset_cfg)
     dataset = initialize_dataset(cfg.pop('dataset'), dset_cfg, mode)
     data_loader = DataLoader(dataset, **cfg)
@@ -80,8 +83,8 @@ def initialize_data_loader(cfg: dict, dset_cfg: dict, mode: str):
 
 def initialize_trainer(cfg: dict, model_cfg: dict, dset_cfg: dict):
     """Creates a Trainer."""
-    loader_train_cfg = cfg.pop('loader_train')
-    loader_test_cfg = cfg.pop('loader_test')
+    loader_train_cfg = cfg.pop('loader_train', None)
+    loader_test_cfg = cfg.pop('loader_test', None)
 
     # Initialize the data loaders
     loader_train = initialize_data_loader(loader_train_cfg, dset_cfg,
