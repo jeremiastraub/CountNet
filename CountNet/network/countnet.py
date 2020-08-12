@@ -41,10 +41,6 @@ class CountNet(EncoderDecoderSkeleton):
                 nn.ReLU(),
                 Inception(f_out, f_out, dilation=2),
                 nn.ReLU(),
-                # nn.Conv2d(f_in, f_out, kernel_size=3, padding=1, padding_mode='reflect'),
-                # nn.ReLU(),
-                # nn.Conv2d(f_out, f_out, kernel_size=3, padding=1, padding_mode='reflect'),
-                # nn.ReLU(),
             )
         return decoder 
 
@@ -52,11 +48,6 @@ class CountNet(EncoderDecoderSkeleton):
         return nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
 
     def construct_upsampling_module(self, depth):
-        # if depth=3:
-        #     f_in = 
-        # f_in = self.fmaps[self.depth]
-        # f_out = self.fmaps[self.depth-1]
-        # return nn.ConvTranspose2d(f_in, f_out, kernel_size=2, stride=2)
         return nn.Upsample(scale_factor=2)
 
     def construct_skip_module(self, depth):

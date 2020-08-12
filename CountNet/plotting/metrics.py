@@ -7,7 +7,11 @@ from .plot_utils import extract_loss_information, extract_metric_information
 
 # -----------------------------------------------------------------------------
 
-def plot_loss_single(tag: str, datapath: str, outpath: str=None, skip: int=0):
+def plot_loss_single(tag: str,
+                     datapath: str,
+                     outpath: str=None,
+                     skip: int=0,
+                     **plot_kwargs):
     """Plot loss over iterations.
     
     Args:
@@ -15,6 +19,7 @@ def plot_loss_single(tag: str, datapath: str, outpath: str=None, skip: int=0):
         datapath (str): Path to stored results
         outpath (str, optional): Path to where the figure is saved
         skip (int, optional): Skip initial steps
+        **plot_kwargs: Passed to plt.plot
     
     Returns:
         Tuple (fig, ax) containing the created plot
@@ -26,7 +31,7 @@ def plot_loss_single(tag: str, datapath: str, outpath: str=None, skip: int=0):
     # sns.set_style('ticks')
 
     fig, ax = plt.subplots()
-    ax.plot(steps[skip:], loss[skip:])
+    ax.plot(steps[skip:], loss[skip:], **plot_kwargs)
     ax.set_xlabel("epoch")
     ax.set_ylabel("MSE Loss")
     sns.despine()
@@ -40,7 +45,8 @@ def plot_loss_multiple(tags: List[str],
                        datapath: str,
                        labels: List[str]=None,
                        outpath:str=None,
-                       skip: int=0):
+                       skip: int=0,
+                       **plot_kwargs):
     """Plot loss over iterations for multiple tags in a single plot.
     
     Args:
@@ -49,6 +55,7 @@ def plot_loss_multiple(tags: List[str],
         labels (List[str], optional): List of legend labels
         outpath (str, optional): Path to where the figure is saved
         skip (int, optional): Skip initial steps
+        **plot_kwargs: Passed to plt.plot
     
     Returns:
         Tuple (fig, ax) containing the created plot
@@ -64,7 +71,8 @@ def plot_loss_multiple(tags: List[str],
     for i, tag in enumerate(tags):
         loss, steps, epoch = extract_loss_information(tag, datapath)
         ax.plot(steps[skip:], loss[skip:],
-                label=(labels[i] if labels_exist else None))
+                label=(labels[i] if labels_exist else None),
+                **plot_kwargs)
 
     ax.set_xlabel("epoch")
     ax.set_ylabel("MSE Loss")
@@ -80,7 +88,8 @@ def plot_loss_multiple(tags: List[str],
 def plot_metric_single(tag: str,
                        metric: str,
                        datapath: str,
-                       outpath: str=None):
+                       outpath: str=None,
+                       **plot_kwargs):
     """Plot a validation metric over iterations.
     
     Args:
@@ -88,6 +97,7 @@ def plot_metric_single(tag: str,
         metric (str): The metric to be plotted
         datapath (str): Path to stored results
         outpath (str, optional): Path to where the figure is saved
+        **plot_kwargs: Passed to plt.plot
     
     Returns:
         Tuple (fig, ax) containing the created plot
@@ -98,7 +108,7 @@ def plot_metric_single(tag: str,
     sns.set(font_scale=1.2)
 
     fig, ax = plt.subplots()
-    ax.plot(epochs, values)
+    ax.plot(epochs, values, **plot_kwargs)
     ax.set_xlabel("epoch")
     ax.set_ylabel(metric)
     sns.despine()
@@ -112,7 +122,8 @@ def plot_metric_multiple(tags: List[str],
                          metric: str,
                          datapath: str,
                          labels: List[str]=None,
-                         outpath: str=None):
+                         outpath: str=None,
+                         **plot_kwargs):
     """Plot a validation metric over iterations for multiple tags.
     
     Args:
@@ -121,6 +132,7 @@ def plot_metric_multiple(tags: List[str],
         datapath (str): Path to stored results
         labels (List[str], optional): Description
         outpath (str, optional): Path to where the figure is saved
+        **plot_kwargs: Passed to plt.plot
     
     Returns:
         Tuple (fig, ax) containing the created plot
@@ -135,7 +147,9 @@ def plot_metric_multiple(tags: List[str],
 
     for i, tag in enumerate(tags):
         values, epochs = extract_metric_information(tag, metric, datapath)
-        ax.plot(epochs, values, label=(labels[i] if labels_exist else None))
+        ax.plot(epochs, values,
+                label=(labels[i] if labels_exist else None),
+                **plot_kwargs)
 
     ax.set_xlabel("epoch")
     ax.set_ylabel(metric)

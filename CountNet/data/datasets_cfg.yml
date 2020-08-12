@@ -3,10 +3,11 @@
 _transforms: &transforms
   Compose:
     - Downscale_Image_GT:
-        downscaling_factor: ~ # 2
-        min_size: [128, 128] # [128, 128]
+        downscaling_factor: ~ # Provide integer of tuple of integers. If None,
+        min_size: [128, 128]  # as much downscaling is done as possible given
+                              # `min_size`.
     - RandomCrop_Image_GT:
-        crop_size: [128, 128] # [128, 128]
+        crop_size: [128, 128]
     - ToTensor_Image_GT
 
 Mall:

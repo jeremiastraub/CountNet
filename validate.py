@@ -30,36 +30,6 @@ if __name__ == '__main__':
     trainer = initialize_trainer(trainer_cfg, model_cfg=model_cfg,
                                               dset_cfg=datasets_cfg)
 
+    print("Starting validation...\n\nValidation configuration:\n"
+          f"{validation_cfg}\n")
     scores = trainer.validate_model(**parse_validation_kwargs(validation_cfg))
-
-    # FIXME This is only temporary!
-
-    # Visualize a few predictions
-    img_batch, dm_batch = next(iter(trainer.loader_test))
-
-    import torch.nn as nn
-    import numpy as np
-    import matplotlib.pyplot as plt
-    print("One example batch:...")
-    trainer.model.to(device='cpu')
-    for i, _ in zip(range(6), range(img_batch.shape[0])):
-        img = img_batch[i,...]
-        dm = dm_batch[i,...]
-
-        plt.imshow(img.permute(1,2,0).numpy().squeeze())
-        plt.imshow(dm.permute(1,2,0).numpy().squeeze(), alpha=0.8)
-        plt.savefig(f"{i}_output_true.png", bbox_inches='tight')
-        plt.close()
-
-        res = trainer.model(img.unsqueeze(0)).detach()
-
-        mse = nn.MSELoss()
-        print("MSE: ", mse(res.squeeze(), dm.squeeze()).item())
-
-        res = res.numpy().squeeze()
-        plt.imshow(res, vmin=0)
-        plt.savefig(f"{i}_output_res.png", bbox_inches='tight')
-        plt.close()
-
-        print("True sum: ", np.sum(dm.permute(1,2,0).numpy().squeeze()))
-        print("Prediction: ", np.sum(res))

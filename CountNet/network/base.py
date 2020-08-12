@@ -6,9 +6,7 @@ import torch
 # -----------------------------------------------------------------------------
 
 class Concatenate(nn.Module):
-    """
-    Concatenate input tensors along a specified dimension.
-    """
+    """Concatenate input tensors along a specified dimension."""
     def __init__(self, dim=1):
         super().__init__()
         self.dim = dim
@@ -60,9 +58,10 @@ class Inception(nn.Module):
                           branch5x5, branch7x7], dim=self.dim)
 
 
-# Adapted from https://github.com/imagirom/ConfNets
 class EncoderDecoderSkeleton(nn.Module):
     """Base class for Networks with Encoder Decoder Structure, such as UNet.
+
+    https://github.com/imagirom/ConfNets/blob/master/confnets/models/unet.py#L85
     """
     def __init__(self, depth):
         super().__init__()

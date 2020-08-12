@@ -1,9 +1,9 @@
-"""Utility functions for plotting"""
+"""Utility functions for evaluation and plotting"""
 
 import os
 import torch
 import numpy as np
-from CountNet.utils import load_yml
+from CountNet.utils import load_yml, initialize_trainer
 
 # -----------------------------------------------------------------------------
 
@@ -78,3 +78,40 @@ def extract_metric_information(tag: str, metric: str, datapath: str):
         values = v_prev + values
 
     return values, epochs
+
+def load_trainer(path_run_cfg: str,
+                 path_dataset_cfg: str,
+                 load_train: bool=False):
+    """Initializes and returns a `Trainer` with the specified configuration.
+    
+    Args:
+        path_run_cfg (str): Path to the run configuration file
+        path_dataset_cfg (str): Path to the datasets configuration file
+        load_train (bool, optional): Whether to load the training data
+    
+    Returns:
+        The Trainer
+    """
+    # Get the configurations
+    datasets_cfg = load_yml(path_dataset_cfg)
+    run_cfg = load_yml(path_run_cfg)
+    validation_cfg = run_cfg.get('validation', None)
+
+    assert validation_cfg is not None, "No validation configuration found!"
+
+    model_cfg = run_cfg['CountNet']
+    trainer_cfg = run_cfg['Trainer']
+
+    if not load_train:
+        # Set 'loader_train' entry to 'None' such that the training data is not
+        # loaded.
+        trainer_cfg['loader_train'] = None
+
+    if not 'validate_run' in trainer_cfg:
+        raise ValueError("No tag found at 'Trainer.validate_run'! The tag "
+                         "specifies the run to be validated.")
+
+    trainer = initialize_trainer(trainer_cfg, model_cfg=model_cfg,
+                                              dset_cfg=datasets_cfg)
+
+    return trainer
