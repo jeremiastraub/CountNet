@@ -143,3 +143,28 @@ def RMSE_pixel(x, y):
     # Average over the batch
     rmse = torch.mean(rmse, dim=0)
     return rmse
+
+# -----------------------------------------------------------------------------
+"""Point-level metrics"""
+
+def APK(x, y, k=10):
+    assert isinstance(x, torch.Tensor)
+    assert isinstance(y, torch.Tensor)
+    assert x.ndim == 4 and y.ndim == 4
+
+    # Calculates the average precision at k.
+    if len(y) > k:
+        y = y[:k]
+
+    score = 0.0
+    num_hits = 0.0
+
+    for i, p in enumerate(y):
+        if p in x and p not in y[:i]:
+            num_hits += 1.0
+            score += num_hits / (i + 1.0)
+
+    if not x:
+        return 0.0
+
+    return score / min(len(x), k)
